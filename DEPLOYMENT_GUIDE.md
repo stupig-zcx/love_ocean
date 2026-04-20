@@ -23,7 +23,7 @@
 2. **部署步骤**：
    - 登录Vercel，点击「New Project」
    - 选择您的项目仓库
-   - 配置构建设置：
+   - 配置构建设置：cp package.json package.json.backup
      - Framework: `Vue.js`
      - Build Command: `npm run build`
      - Output Directory: `dist`
