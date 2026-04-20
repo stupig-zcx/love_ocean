@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx --no-install vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "engines": {
@@ -15,7 +15,7 @@
     "vue": "^3.4.38"
   },
   "devDependencies": {
-    "vite": "^4.5.14",
+    "vite": "^5.0.0",
     "@vitejs/plugin-vue": "^4.6.2"
   }
 }
