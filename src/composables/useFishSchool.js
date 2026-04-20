@@ -2,7 +2,7 @@
 
 const random = (min, max) => min + Math.random() * (max - min);
 const TAU = Math.PI * 2;
-const FISH_TYPES = ["goldie", "peach", "mint", "dream", "sword", "shark", "clown", "puffer"];
+const FISH_TYPES = ["goldie", "peach", "mint", "dream", "sword", "shark", "clown", "puffer", "starfish", "jellyfish"];
 const FISH_TYPE_CONFIG = {
   goldie: { sizeMul: 1, speedMul: 1 },
   peach: { sizeMul: 0.96, speedMul: 1.02 },
@@ -12,6 +12,8 @@ const FISH_TYPE_CONFIG = {
   shark: { sizeMul: 1.16, speedMul: 1.12 },
   clown: { sizeMul: 0.9, speedMul: 1.08 },
   puffer: { sizeMul: 1.08, speedMul: 0.84 },
+  starfish: { sizeMul: 1.02, speedMul: 0.72 },
+  jellyfish: { sizeMul: 1.12, speedMul: 0.66 },
 };
 
 const normalizeAngle = (angle) => {
