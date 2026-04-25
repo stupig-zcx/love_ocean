@@ -1,20 +1,22 @@
 ﻿<script setup>
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+const props = defineProps({
+  mode: {
+    type: String,
+    default: "ocean",
+  },
+});
 
 const canvasRef = ref(null);
 
 let ctx;
 let animationId;
-let stars = [];
-let sparks = [];
-let tick = 0;
+const ambience = [];
+const trail = [];
 const mouse = { x: 0, y: 0, active: false };
 
-const STAR_COUNT = 120;
-
 const random = (min, max) => min + Math.random() * (max - min);
-
-const hsla = (h, s, l, a) => `hsla(${h}, ${s}%, ${l}%, ${a})`;
 
 const resize = () => {
   const canvas = canvasRef.value;
@@ -34,42 +36,171 @@ const resize = () => {
   ctx = canvas.getContext("2d");
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-  stars = Array.from({ length: STAR_COUNT }, () => ({
-    x: random(0, width),
-    y: random(0, height),
-    r: random(0.7, 2.2),
-    phase: random(0, Math.PI * 2),
-    speed: random(0.004, 0.012),
-    alpha: random(0.25, 0.62),
-    hueSeed: random(0, 360),
-  }));
+  rebuildAmbience();
 };
 
-const spawnSparks = (x, y) => {
-  const amount = 9;
-  for (let i = 0; i < amount; i += 1) {
-    sparks.push({
-      x,
-      y,
-      vx: random(-1.35, 1.35),
-      vy: random(-1.4, 1.4),
-      life: random(26, 46),
-      maxLife: random(26, 46),
-      r: random(1.0, 2.5),
-      hueSeed: random(0, 360),
+const rebuildAmbience = () => {
+  ambience.length = 0;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  if (props.mode === "ocean") {
+    for (let i = 0; i < 55; i += 1) {
+      ambience.push({
+        x: random(0, width),
+        y: random(0, height),
+        r: random(1.2, 4.8),
+        driftX: random(-0.18, 0.18),
+        driftY: random(-0.45, -0.08),
+        alpha: random(0.08, 0.24),
+      });
+    }
+    return;
+  }
+
+  for (let i = 0; i < 120; i += 1) {
+    ambience.push({
+      x: random(0, width),
+      y: random(0, height),
+      r: random(0.6, 1.8),
+      twinkle: random(0, Math.PI * 2),
+      speed: random(0.01, 0.03),
+      alpha: random(0.15, 0.52),
     });
   }
 };
 
-const onMouseMove = (event) => {
+const spawnOceanTrail = (x, y) => {
+  for (let i = 0; i < 7; i += 1) {
+    trail.push({
+      kind: "bubble",
+      x,
+      y,
+      vx: random(-0.4, 0.4),
+      vy: random(-1.05, -0.35),
+      life: random(34, 58),
+      maxLife: random(34, 58),
+      r: random(1.8, 5.2),
+    });
+  }
+};
+
+const spawnStarTrail = (x, y) => {
+  for (let i = 0; i < 9; i += 1) {
+    trail.push({
+      kind: "star",
+      x,
+      y,
+      vx: random(-1.2, 1.2),
+      vy: random(-1.1, 1.1),
+      life: random(22, 40),
+      maxLife: random(22, 40),
+      r: random(0.8, 2.3),
+    });
+  }
+};
+
+const onPointerMove = (event) => {
   mouse.x = event.clientX;
   mouse.y = event.clientY;
   mouse.active = true;
-  spawnSparks(mouse.x, mouse.y);
+
+  if (props.mode === "ocean") {
+    spawnOceanTrail(mouse.x, mouse.y);
+  } else {
+    spawnStarTrail(mouse.x, mouse.y);
+  }
 };
 
-const onMouseLeave = () => {
+const onPointerLeave = () => {
   mouse.active = false;
+};
+
+const drawOcean = (width, height) => {
+  for (const item of ambience) {
+    item.x += item.driftX;
+    item.y += item.driftY;
+    if (item.y < -10) {
+      item.y = height + 10;
+      item.x = random(0, width);
+    }
+    if (item.x < -12) {
+      item.x = width + 12;
+    }
+    if (item.x > width + 12) {
+      item.x = -12;
+    }
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(198, 238, 255, ${item.alpha})`;
+    ctx.fill();
+  }
+
+  for (let i = trail.length - 1; i >= 0; i -= 1) {
+    const item = trail[i];
+    item.life -= 1;
+    item.x += item.vx;
+    item.y += item.vy;
+    item.vx *= 0.985;
+    item.vy *= 0.985;
+
+    if (item.life <= 0) {
+      trail.splice(i, 1);
+      continue;
+    }
+
+    const alpha = (item.life / item.maxLife) * 0.65;
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(218, 246, 255, ${alpha})`;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r + 0.9, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(188, 232, 255, ${alpha * 0.8})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+};
+
+const drawStars = () => {
+  for (const item of ambience) {
+    item.twinkle += item.speed;
+    const alpha = item.alpha + Math.sin(item.twinkle) * 0.14;
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.06, alpha)})`;
+    ctx.fill();
+  }
+
+  for (let i = trail.length - 1; i >= 0; i -= 1) {
+    const item = trail[i];
+    item.life -= 1;
+    item.x += item.vx;
+    item.y += item.vy;
+    item.vx *= 0.985;
+    item.vy *= 0.985;
+
+    if (item.life <= 0) {
+      trail.splice(i, 1);
+      continue;
+    }
+
+    const alpha = (item.life / item.maxLife) * 0.9;
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r * 1.9, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.18})`;
+    ctx.fill();
+  }
 };
 
 const draw = () => {
@@ -77,70 +208,39 @@ const draw = () => {
     return;
   }
 
-  tick += 1;
   const width = window.innerWidth;
   const height = window.innerHeight;
   ctx.clearRect(0, 0, width, height);
 
-  for (const star of stars) {
-    star.phase += star.speed;
-    const twinkle = 0.5 + Math.sin(star.phase) * 0.35;
-    let alpha = star.alpha * twinkle;
-
-    if (mouse.active) {
-      const dx = star.x - mouse.x;
-      const dy = star.y - mouse.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 180) {
-        alpha += ((180 - dist) / 180) * 0.4;
-      }
-    }
-
-    const hue = (star.hueSeed + tick * 0.22 + (star.x / width) * 70 + (star.y / height) * 45) % 360;
-
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-    ctx.fillStyle = hsla(hue, 84, 68, Math.min(alpha, 0.98));
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, star.r * 2.1, 0, Math.PI * 2);
-    ctx.fillStyle = hsla(hue, 86, 64, Math.min(alpha * 0.25, 0.28));
-    ctx.fill();
-  }
-
-  sparks = sparks.filter((spark) => spark.life > 0);
-  for (const spark of sparks) {
-    spark.life -= 1;
-    spark.x += spark.vx;
-    spark.y += spark.vy;
-    spark.vx *= 0.985;
-    spark.vy *= 0.985;
-
-    const alpha = (spark.life / spark.maxLife) * 0.92;
-    const hue = (spark.hueSeed + tick * 0.6 + spark.life * 2.2) % 360;
-
-    ctx.beginPath();
-    ctx.arc(spark.x, spark.y, spark.r, 0, Math.PI * 2);
-    ctx.fillStyle = hsla(hue, 90, 72, alpha);
-    ctx.fill();
+  if (props.mode === "ocean") {
+    drawOcean(width, height);
+  } else {
+    drawStars();
   }
 
   animationId = window.requestAnimationFrame(draw);
 };
 
+watch(
+  () => props.mode,
+  () => {
+    trail.length = 0;
+    rebuildAmbience();
+  }
+);
+
 onMounted(() => {
   resize();
   draw();
   window.addEventListener("resize", resize);
-  window.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseleave", onMouseLeave);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerleave", onPointerLeave);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", resize);
-  window.removeEventListener("mousemove", onMouseMove);
-  window.removeEventListener("mouseleave", onMouseLeave);
+  window.removeEventListener("pointermove", onPointerMove);
+  window.removeEventListener("pointerleave", onPointerLeave);
   if (animationId) {
     window.cancelAnimationFrame(animationId);
   }
