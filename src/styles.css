@@ -139,11 +139,11 @@ body {
   color: #d2eeff;
 }
 
-.hero h2,
-.sky-header h2 {
+.hero h2,.hero h4,
+.sky-header h2,.sky-header h4 {
   margin: 14px auto 0;
   font-family: "ZCOOL KuaiLe", cursive;
-  font-size: clamp(1.5rem, 3vw, 2.8rem);
+  /* font-size: clamp(1.5rem, 3vw, 2.8rem); */
   max-width: 860px;
   color: #f1fbff;
   text-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
@@ -733,7 +733,7 @@ body {
 }
 
 .love-meta {
-  margin: 12px auto 0;
+  margin: 32px auto 0;
   max-width: 980px;
   font-family: "Cormorant Garamond", "Times New Roman", "Microsoft YaHei", serif;
   font-size: clamp(0.96rem, 1.6vw, 1.22rem);
@@ -797,10 +797,13 @@ body {
   content: "";
   position: absolute;
   top: calc(18px + (var(--pin-size) * 0.5));
-  left: calc(50% + 14px);
-  width: calc(var(--node-width) + var(--node-gap) - 28px);
+  left: 50%;
+  width: var(--link-length);
   border-top: 1px dashed rgba(255, 255, 255, 0.52);
+  transform-origin: 0 50%;
+  transform: rotate(var(--link-angle));
   pointer-events: none;
+  z-index: 0;
 }
 
 .star-node:last-child::after {
@@ -817,6 +820,7 @@ body {
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 56%, 79% 92%, 50% 71%, 21% 92%, 32% 56%, 2% 35%, 39% 35%);
   background: #ffffff;
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.78));
+  z-index: 1;
 }
 
 .star-thread {
@@ -827,6 +831,7 @@ body {
   height: 82px;
   transform: translateX(-50%);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.25));
+  z-index: 1;
 }
 
 .note-paper {
@@ -845,6 +850,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  z-index: 1;
 }
 
 .note-date {

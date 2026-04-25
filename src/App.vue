@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import FishNode from "./components/FishNode.vue";
 import IntroOverlay from "./components/IntroOverlay.vue";
 import MouseSparkleLayer from "./components/MouseSparkleLayer.vue";
@@ -20,6 +20,7 @@ const skyAudioRef = ref(null);
 const inSkyScene = ref(false);
 const musicEnabled = ref(true);
 const audioUnlocked = ref(false);
+const viewportWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1280);
 
 const audioModules = import.meta.glob("./audio/*.{mp3,wav,ogg,m4a,aac,flac}", {
   eager: true,
@@ -39,9 +40,9 @@ const skyMusicSrc =
 const hasMusic = computed(() => Boolean(oceanMusicSrc || skyMusicSrc));
 
 const loveProfile = {
-  chenBirthday: "03.16",
-  yiBirthday: "09.21",
-  togetherSince: "2024-02-14",
+  chenBirthday: "05.02",
+  yiBirthday: "03.23",
+  togetherSince: "2026-04-06",
 };
 
 const togetherDays = computed(() => {
@@ -65,18 +66,44 @@ const dragState = {
   velocity: 0,
   momentumId: null,
 };
+const flippedStars = reactive({});
 
 const { fishNodes } = useFishSchool(stories, oceanStageRef);
+const starNodeWidth = computed(() => (viewportWidth.value <= 768 ? 150 : 180));
+const starNodeGap = computed(() => (viewportWidth.value <= 768 ? 28 : 58));
 
 const starNodes = computed(() => {
   const zOffsets = [-42, 24, -16, 46, -30, 18, -12, 36, -24, 40];
+  const spacing = starNodeWidth.value + starNodeGap.value;
 
-  return starTimeline.map((node, index) => ({
+  const nodes = starTimeline.map((node, index) => ({
     ...node,
+    nodeKey: node.id || `${node.date}-${node.title}`,
     driftY: zOffsets[index % zOffsets.length],
     paperTilt: ((index * 9) % 10) - 5,
     pinSize: 24 + ((index * 7) % 10),
   }));
+
+  return nodes.map((node, index) => {
+    const nextNode = nodes[index + 1];
+    if (!nextNode) {
+      return {
+        ...node,
+        linkAngle: 0,
+        linkLength: 0,
+      };
+    }
+
+    const currentY = node.driftY + 18 + node.pinSize * 0.5;
+    const nextY = nextNode.driftY + 18 + nextNode.pinSize * 0.5;
+    const deltaY = nextY - currentY;
+
+    return {
+      ...node,
+      linkLength: Math.hypot(spacing, deltaY),
+      linkAngle: (Math.atan2(deltaY, spacing) * 180) / Math.PI,
+    };
+  });
 });
 
 const fishStyle = (fish) => ({
@@ -91,6 +118,8 @@ const starStyle = (node, index) => ({
   "--drift-y": `${node.driftY}px`,
   "--paper-tilt": `${node.paperTilt}deg`,
   "--pin-size": `${node.pinSize}px`,
+  "--link-length": `${node.linkLength}px`,
+  "--link-angle": `${node.linkAngle}deg`,
   "--entry-delay": `${index * 0.07}s`,
 });
 
@@ -269,12 +298,18 @@ const onStarClick = (event, node) => {
     event.preventDefault();
     return;
   }
-  openStory(node);
+  flippedStars[node.nodeKey] = !flippedStars[node.nodeKey];
 };
+
+const isStarFlipped = (nodeKey) => Boolean(flippedStars[nodeKey]);
 
 const unlockAudio = () => {
   audioUnlocked.value = true;
   syncSceneMusic();
+};
+
+const onWindowResize = () => {
+  viewportWidth.value = window.innerWidth;
 };
 
 watch([inSkyScene, musicEnabled, audioUnlocked], () => {
@@ -288,11 +323,13 @@ onMounted(() => {
 
   window.addEventListener("pointerdown", unlockAudio, { once: true });
   window.addEventListener("keydown", onEsc);
+  window.addEventListener("resize", onWindowResize);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("pointerdown", unlockAudio);
   window.removeEventListener("keydown", onEsc);
+  window.removeEventListener("resize", onWindowResize);
   document.body.style.overflow = "";
   pauseAudio(oceanAudioRef.value);
   pauseAudio(skyAudioRef.value);
@@ -317,6 +354,7 @@ onBeforeUnmount(() => {
           <header class="hero">
             <p class="hero-subtitle">OUR OCEAN LOVE STORY</p>
             <h2>在蓝色海洋里，遇见每一段心动回忆</h2>
+            <h4>点击抓捕小鱼，查看珍贵回忆瞬间</h4>
           </header>
 
           <section ref="oceanStageRef" class="ocean-stage" aria-label="游动故事鱼群">
@@ -334,10 +372,10 @@ onBeforeUnmount(() => {
       <section class="scene-panel sky-panel" aria-label="星空时间线">
         <header class="sky-header">
           <p class="hero-subtitle sky-subtitle">OUR STAR MAP</p>
-          <h2>左右拖动星空，查看每个时间节点</h2>
+          <h2>在广袤星空中，查看独属于我们的时间线</h2>
+          <h4>左右拖动星空查看时间节点</h4>
           <p class="love-meta">
-            小晨生日 {{ loveProfile.chenBirthday }} · 小逸生日 {{ loveProfile.yiBirthday }} · 在一起
-            {{ loveProfile.togetherSince }} · 第 {{ togetherDays }} 天
+            Chen {{ loveProfile.chenBirthday }} · Yi {{ loveProfile.yiBirthday }} · Together since {{ loveProfile.togetherSince }} ·  lasts for {{ togetherDays }} days
           </p>
         </header>
 
@@ -352,17 +390,25 @@ onBeforeUnmount(() => {
         >
           <button
             v-for="(node, index) in starNodes"
-            :key="`star-${index}`"
+            :key="node.nodeKey"
             class="star-node"
+            :class="{ 'is-flipped': isStarFlipped(node.nodeKey) }"
             :style="starStyle(node, index)"
+            :aria-pressed="isStarFlipped(node.nodeKey)"
             @click="onStarClick($event, node)"
           >
             <span class="star-pin" aria-hidden="true"></span>
             <span class="star-thread" aria-hidden="true"></span>
             <span class="note-paper">
-              <span class="note-date">{{ node.date }}</span>
-              <span class="note-title">{{ node.title }}</span>
-              <span class="note-metric">{{ node.metric }}</span>
+              <span class="note-inner">
+                <span class="note-face note-front">
+                  <span class="note-title">{{ node.title }}</span>
+                  <span class="note-date">{{ node.date }}</span>
+                </span>
+                <span class="note-face note-back">
+                  <span class="note-text">{{ node.text }}</span>
+                </span>
+              </span>
             </span>
           </button>
         </div>

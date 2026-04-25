@@ -15,6 +15,7 @@ let animationId;
 const ambience = [];
 const trail = [];
 const mouse = { x: 0, y: 0, active: false };
+let lastOceanTrailAt = 0;
 
 const random = (min, max) => min + Math.random() * (max - min);
 
@@ -45,7 +46,7 @@ const rebuildAmbience = () => {
   const height = window.innerHeight;
 
   if (props.mode === "ocean") {
-    for (let i = 0; i < 55; i += 1) {
+    for (let i = 0; i < 42; i += 1) {
       ambience.push({
         x: random(0, width),
         y: random(0, height),
@@ -71,16 +72,19 @@ const rebuildAmbience = () => {
 };
 
 const spawnOceanTrail = (x, y) => {
-  for (let i = 0; i < 7; i += 1) {
+  const bubbleCount = Math.floor(random(2, 4));
+  for (let i = 0; i < bubbleCount; i += 1) {
     trail.push({
       kind: "bubble",
       x,
       y,
-      vx: random(-0.4, 0.4),
-      vy: random(-1.05, -0.35),
-      life: random(34, 58),
-      maxLife: random(34, 58),
-      r: random(1.8, 5.2),
+      vx: random(-0.36, 0.36),
+      vy: random(-5.92, -1.4),
+      life: random(48, 78),
+      maxLife: random(48, 78),
+      r: random(3.8, 8.4),
+      sway: random(0, Math.PI * 2),
+      swaySpeed: random(0.1, 0.12),
     });
   }
 };
@@ -106,7 +110,11 @@ const onPointerMove = (event) => {
   mouse.active = true;
 
   if (props.mode === "ocean") {
-    spawnOceanTrail(mouse.x, mouse.y);
+    const now = performance.now();
+    if (now - lastOceanTrailAt > 58) {
+      spawnOceanTrail(mouse.x, mouse.y);
+      lastOceanTrailAt = now;
+    }
   } else {
     spawnStarTrail(mouse.x, mouse.y);
   }
@@ -140,10 +148,11 @@ const drawOcean = (width, height) => {
   for (let i = trail.length - 1; i >= 0; i -= 1) {
     const item = trail[i];
     item.life -= 1;
-    item.x += item.vx;
+    item.sway += item.swaySpeed;
+    item.x += item.vx + Math.sin(item.sway) * 0.12;
     item.y += item.vy;
-    item.vx *= 0.985;
-    item.vy *= 0.985;
+    item.vx *= 0.992;
+    item.vy *= 0.994;
 
     if (item.life <= 0) {
       trail.splice(i, 1);
