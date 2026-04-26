@@ -16,6 +16,7 @@ const localImagesByName = Object.entries(localImageModules)
 
 const localImageList = Object.keys(localImagesByName).map((name) => localImagesByName[name]);
 
+// Raw stories for fish nodes.
 const storySeed = [
   {
     title: "相识",
@@ -70,6 +71,7 @@ const storySeed = [
 
 const sharedStoryImage = localImagesByName["story-01.jpg"] || localImageList[0];
 
+// Final normalized stories consumed by the UI.
 export const stories = storySeed.map((story, index) => {
   const localByName = story.localFile ? localImagesByName[story.localFile] : undefined;
 

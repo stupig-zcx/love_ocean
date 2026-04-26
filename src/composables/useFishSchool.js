@@ -1,5 +1,6 @@
 ﻿import { onBeforeUnmount, onMounted, ref } from "vue";
 
+// Utility helpers for movement and steering math.
 const random = (min, max) => min + Math.random() * (max - min);
 const TAU = Math.PI * 2;
 const FISH_TYPES = ["goldie", "peach", "mint", "dream", "sword", "shark", "clown", "puffer", "starfish", "jellyfish"];
@@ -30,6 +31,7 @@ const normalizeAngle = (angle) => {
 const shortestAngle = (from, to) => normalizeAngle(to - from);
 
 export function useFishSchool(storiesRef, stageRef) {
+  // Reactive fish list rendered by Scene 1.
   const fishNodes = ref([]);
 
   let rafId;
@@ -81,14 +83,11 @@ export function useFishSchool(storiesRef, stageRef) {
       return;
     }
 
-    fishNodes.value = fishNodes.value.map((fish) => {
+    for (const fish of fishNodes.value) {
       const pad = fish.size * 0.45;
-      return {
-        ...fish,
-        x: Math.min(width - pad, Math.max(pad, fish.x)),
-        y: Math.min(height - pad, Math.max(pad, fish.y)),
-      };
-    });
+      fish.x = Math.min(width - pad, Math.max(pad, fish.x));
+      fish.y = Math.min(height - pad, Math.max(pad, fish.y));
+    }
   };
 
   const updateFish = (time) => {
@@ -106,54 +105,51 @@ export function useFishSchool(storiesRef, stageRef) {
       return;
     }
 
-    fishNodes.value = fishNodes.value.map((fish) => {
-      const next = { ...fish };
-
-      next.turnTimer -= elapsed;
-      if (next.turnTimer <= 0) {
-        next.targetAngle = normalizeAngle(next.angle + random(-Math.PI * 0.5, Math.PI * 0.5));
-        next.turnTimer = random(900, 2600);
+    // Update fish in place to avoid allocating new objects every frame.
+    for (const fish of fishNodes.value) {
+      fish.turnTimer -= elapsed;
+      if (fish.turnTimer <= 0) {
+        fish.targetAngle = normalizeAngle(fish.angle + random(-Math.PI * 0.5, Math.PI * 0.5));
+        fish.turnTimer = random(900, 2600);
       }
 
-      const steer = shortestAngle(next.angle, next.targetAngle);
-      next.angle = normalizeAngle(next.angle + steer * 0.055 * dt + random(-0.008, 0.008) * dt);
+      const steer = shortestAngle(fish.angle, fish.targetAngle);
+      fish.angle = normalizeAngle(fish.angle + steer * 0.055 * dt + random(-0.008, 0.008) * dt);
 
-      next.x += Math.cos(next.angle) * next.speed * 2.25 * dt;
-      next.y += Math.sin(next.angle) * next.speed * 1.8 * dt;
+      fish.x += Math.cos(fish.angle) * fish.speed * 2.25 * dt;
+      fish.y += Math.sin(fish.angle) * fish.speed * 1.8 * dt;
 
-      const pad = next.size * 0.45;
+      const pad = fish.size * 0.45;
       let bounced = false;
 
-      if (next.x <= pad) {
-        next.x = pad;
-        next.angle = normalizeAngle(Math.PI - next.angle);
+      if (fish.x <= pad) {
+        fish.x = pad;
+        fish.angle = normalizeAngle(Math.PI - fish.angle);
         bounced = true;
-      } else if (next.x >= width - pad) {
-        next.x = width - pad;
-        next.angle = normalizeAngle(Math.PI - next.angle);
+      } else if (fish.x >= width - pad) {
+        fish.x = width - pad;
+        fish.angle = normalizeAngle(Math.PI - fish.angle);
         bounced = true;
       }
 
-      if (next.y <= pad) {
-        next.y = pad;
-        next.angle = normalizeAngle(-next.angle);
+      if (fish.y <= pad) {
+        fish.y = pad;
+        fish.angle = normalizeAngle(-fish.angle);
         bounced = true;
-      } else if (next.y >= height - pad) {
-        next.y = height - pad;
-        next.angle = normalizeAngle(-next.angle);
+      } else if (fish.y >= height - pad) {
+        fish.y = height - pad;
+        fish.angle = normalizeAngle(-fish.angle);
         bounced = true;
       }
 
       if (bounced) {
-        next.targetAngle = next.angle;
-        next.turnTimer = random(700, 1400);
+        fish.targetAngle = fish.angle;
+        fish.turnTimer = random(700, 1400);
       }
 
-      next.wobble += 0.09 * dt;
-      next.tilt = Math.sin(next.wobble) * 2.8;
-
-      return next;
-    });
+      fish.wobble += 0.09 * dt;
+      fish.tilt = Math.sin(fish.wobble) * 2.8;
+    }
 
     rafId = window.requestAnimationFrame(updateFish);
   };

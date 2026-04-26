@@ -1,4 +1,5 @@
 ﻿<script setup>
+// Single animated fish node in Scene 1 (click to open story modal).
 const props = defineProps({
   fish: {
     type: Object,

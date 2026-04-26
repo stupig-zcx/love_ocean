@@ -8,6 +8,7 @@ import { useFishSchool } from "./composables/useFishSchool";
 import { stories as storySeed } from "./data/stories";
 import { starTimeline } from "./data/starTimeline";
 
+// Global UI state
 const introVisible = ref(true);
 const modalOpen = ref(false);
 const activeStory = ref(null);
@@ -22,6 +23,7 @@ const musicEnabled = ref(true);
 const audioUnlocked = ref(false);
 const viewportWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1280);
 
+// Resolve scene music files from local audio folder
 const audioModules = import.meta.glob("./audio/*.{mp3,wav,ogg,m4a,aac,flac}", {
   eager: true,
   import: "default",
@@ -39,6 +41,7 @@ const skyMusicSrc =
   audioByName["sky.mp3"] || audioByName["stars.mp3"] || audioByName["sky.wav"] || "";
 const hasMusic = computed(() => Boolean(oceanMusicSrc || skyMusicSrc));
 
+// Header profile metadata
 const loveProfile = {
   chenBirthday: "05.02",
   yiBirthday: "03.23",
@@ -66,13 +69,16 @@ const dragState = {
   velocity: 0,
   momentumId: null,
 };
+// Each star card keeps its own front/back flip state.
 const flippedStars = reactive({});
+let resizeRafId = 0;
 
 const { fishNodes } = useFishSchool(stories, oceanStageRef);
 const starNodeWidth = computed(() => (viewportWidth.value <= 768 ? 150 : 180));
 const starNodeGap = computed(() => (viewportWidth.value <= 768 ? 28 : 58));
 
 const starNodes = computed(() => {
+  // Create a z-like vertical rhythm for the horizontal timeline.
   const zOffsets = [-42, 24, -16, 46, -30, 18, -12, 36, -24, 40];
   const spacing = starNodeWidth.value + starNodeGap.value;
 
@@ -145,7 +151,10 @@ const onSceneScroll = () => {
   if (!scene) {
     return;
   }
-  inSkyScene.value = scene.scrollTop > window.innerHeight * 0.35;
+  const nextInSkyScene = scene.scrollTop > window.innerHeight * 0.35;
+  if (nextInSkyScene !== inSkyScene.value) {
+    inSkyScene.value = nextInSkyScene;
+  }
 };
 
 const pauseAudio = (audio) => {
@@ -154,6 +163,7 @@ const pauseAudio = (audio) => {
   }
 };
 
+// Audio playback helper for scene-based background music.
 const playAudioSafe = async (audio) => {
   if (!audio || !audio.src) {
     return;
@@ -198,6 +208,7 @@ const stopMomentum = () => {
   }
 };
 
+// Inertial horizontal dragging for Scene 2 timeline.
 const startMomentum = () => {
   const container = starScrollRef.value;
   if (!container) {
@@ -303,13 +314,21 @@ const onStarClick = (event, node) => {
 
 const isStarFlipped = (nodeKey) => Boolean(flippedStars[nodeKey]);
 
+// Browser gesture unlock for autoplay-restricted audio.
 const unlockAudio = () => {
   audioUnlocked.value = true;
   syncSceneMusic();
 };
 
 const onWindowResize = () => {
-  viewportWidth.value = window.innerWidth;
+  // Throttle resize updates to animation frames to avoid reactive churn.
+  if (resizeRafId) {
+    return;
+  }
+  resizeRafId = window.requestAnimationFrame(() => {
+    viewportWidth.value = window.innerWidth;
+    resizeRafId = 0;
+  });
 };
 
 watch([inSkyScene, musicEnabled, audioUnlocked], () => {
@@ -333,22 +352,31 @@ onBeforeUnmount(() => {
   document.body.style.overflow = "";
   pauseAudio(oceanAudioRef.value);
   pauseAudio(skyAudioRef.value);
+  if (resizeRafId) {
+    window.cancelAnimationFrame(resizeRafId);
+  }
   stopMomentum();
 });
 </script>
 
 <template>
   <div>
+    <!-- Global visual layers -->
     <MouseSparkleLayer :mode="inSkyScene ? 'star' : 'ocean'" />
     <IntroOverlay :visible="introVisible" />
+
+    <!-- Scene background music players -->
     <audio ref="oceanAudioRef" :src="oceanMusicSrc || undefined" loop preload="auto"></audio>
     <audio ref="skyAudioRef" :src="skyMusicSrc || undefined" loop preload="auto"></audio>
 
+    <!-- Manual music switch -->
     <button class="music-toggle" type="button" :disabled="!hasMusic" @click="toggleMusic">
       {{ !hasMusic ? "无音乐文件" : musicEnabled ? "音乐: 开" : "音乐: 关" }}
     </button>
 
-    <div ref="sceneScrollRef" class="scene-scroll" :class="{ ready: !introVisible }" @scroll="onSceneScroll">
+    <!-- Scene 1 + Scene 2 container -->
+    <div ref="sceneScrollRef" class="scene-scroll" :class="{ ready: !introVisible }" @scroll.passive="onSceneScroll">
+      <!-- Scene 1: ocean fish memories -->
       <section class="scene-panel ocean-panel">
         <main class="story-world ocean-world" aria-label="恋爱海洋故事">
           <header class="hero">
@@ -369,6 +397,7 @@ onBeforeUnmount(() => {
         </main>
       </section>
 
+      <!-- Scene 2: horizontal star timeline -->
       <section class="scene-panel sky-panel" aria-label="星空时间线">
         <header class="sky-header">
           <p class="hero-subtitle sky-subtitle">OUR STAR MAP</p>
@@ -417,6 +446,7 @@ onBeforeUnmount(() => {
       </section>
     </div>
 
+    <!-- Full-screen story modal (used by scene 1 fish nodes) -->
     <StoryModal :open="modalOpen" :story="activeStory" @close="closeStory" />
   </div>
 </template>

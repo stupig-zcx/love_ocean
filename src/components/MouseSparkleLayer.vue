@@ -1,6 +1,7 @@
 ﻿<script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
+// Scene-aware background canvas: ocean bubbles (scene 1) and star particles (scene 2).
 const props = defineProps({
   mode: {
     type: String,
@@ -16,6 +17,7 @@ const ambience = [];
 const trail = [];
 const mouse = { x: 0, y: 0, active: false };
 let lastOceanTrailAt = 0;
+const MAX_TRAIL_ITEMS = 260;
 
 const random = (min, max) => min + Math.random() * (max - min);
 
@@ -25,7 +27,8 @@ const resize = () => {
     return;
   }
 
-  const ratio = window.devicePixelRatio || 1;
+  // Cap DPR to reduce canvas overdraw cost on high-density screens.
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
   const width = window.innerWidth;
   const height = window.innerHeight;
 
@@ -87,6 +90,9 @@ const spawnOceanTrail = (x, y) => {
       swaySpeed: random(0.1, 0.12),
     });
   }
+  if (trail.length > MAX_TRAIL_ITEMS) {
+    trail.splice(0, trail.length - MAX_TRAIL_ITEMS);
+  }
 };
 
 const spawnStarTrail = (x, y) => {
@@ -101,6 +107,9 @@ const spawnStarTrail = (x, y) => {
       maxLife: random(22, 40),
       r: random(0.8, 2.3),
     });
+  }
+  if (trail.length > MAX_TRAIL_ITEMS) {
+    trail.splice(0, trail.length - MAX_TRAIL_ITEMS);
   }
 };
 
@@ -242,8 +251,8 @@ onMounted(() => {
   resize();
   draw();
   window.addEventListener("resize", resize);
-  window.addEventListener("pointermove", onPointerMove);
-  window.addEventListener("pointerleave", onPointerLeave);
+  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  window.addEventListener("pointerleave", onPointerLeave, { passive: true });
 });
 
 onBeforeUnmount(() => {

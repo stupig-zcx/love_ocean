@@ -1,4 +1,5 @@
 ﻿<script setup>
+// Opening cinematic overlay before entering the world.
 defineProps({
   visible: {
     type: Boolean,

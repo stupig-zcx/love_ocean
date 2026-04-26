@@ -1,4 +1,5 @@
 ﻿<script setup>
+// Reusable full-screen modal for story image + text (Scene 1).
 defineProps({
   open: {
     type: Boolean,

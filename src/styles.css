@@ -25,6 +25,7 @@ body {
   overflow: hidden;
 }
 
+/* Scene scrolling container (Scene 1 + Scene 2) */
 .scene-scroll {
   position: relative;
   z-index: 1;
@@ -52,6 +53,7 @@ body {
     linear-gradient(180deg, #06224e 0%, #07356e 30%, #0b4f8f 62%, #0e639a 100%);
 }
 
+/* Global particle canvas (mouse trail + ambience) */
 .mouse-sparkle-layer {
   position: fixed;
   inset: 0;
@@ -149,6 +151,7 @@ body {
   text-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
 }
 
+/* Scene 1 fish tank area */
 .ocean-stage {
   position: relative;
   max-width: 1060px;
@@ -742,6 +745,7 @@ body {
   line-height: 1.35;
 }
 
+/* Scene 2 star timeline container */
 .star-scroll {
   position: relative;
   --node-width: 180px;
@@ -774,6 +778,7 @@ body {
   border-radius: 999px;
 }
 
+/* Scene 2 interactive card shell */
 .star-node {
   flex: 0 0 auto;
   width: var(--node-width);
@@ -864,13 +869,6 @@ body {
   font-size: 0.82rem;
   line-height: 1.24;
   font-weight: 700;
-}
-
-.note-metric {
-  margin-top: 2px;
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
-  color: #86785f;
 }
 
 .story-footer {
