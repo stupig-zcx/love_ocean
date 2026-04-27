@@ -20,7 +20,7 @@ const mouse = { x: 0, y: 0, prevX: 0, prevY: 0, hasPrevious: false, active: fals
 let lastOceanTrailAt = 0;
 const MAX_TRAIL_ITEMS = 260;
 const MAX_TRAVEL_STREAM_POINTS = 34;
-const TRAVEL_STREAM_POINT_LIFE = 82;
+const TRAVEL_STREAM_POINT_LIFE = 50;
 const TRAVEL_STREAM_MIN_DISTANCE = 5;
 
 const random = (min, max) => min + Math.random() * (max - min);

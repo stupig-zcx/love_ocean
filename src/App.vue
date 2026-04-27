@@ -38,7 +38,7 @@ const musicByKey = {
   ocean: pickAudioSource("ocean.mp3", "sea.mp3", "ocean.wav"),
   sky: pickAudioSource("sky.mp3", "stars.mp3", "sky.wav"),
   fragments: pickAudioSource("fragments.mp3", "memory.mp3", "fragments.wav"),
-  travel: pickAudioSource("travel.mp3", "map.mp3", "travel.wav"),
+  travel: pickAudioSource("map.mp3", "travel.mp3", "travel.wav"),
 };
 
 const musicVolumeByKey = {
@@ -206,4 +206,3 @@ onBeforeUnmount(() => {
     <StoryModal :open="modalOpen" :story="activeStory" @close="closeStory" />
   </div>
 </template>
-
