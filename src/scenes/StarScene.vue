@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { starTimeline } from "../data/starTimeline";
 
 defineProps({
@@ -31,7 +31,9 @@ const togetherDays = computed(() => {
 
 const dragState = {
   active: false,
+  moved: false,
   pointerId: null,
+  pressedNodeKey: "",
   startX: 0,
   startScrollLeft: 0,
   lastX: 0,
@@ -40,14 +42,28 @@ const dragState = {
   momentumId: null,
 };
 
+const flippedStars = reactive({});
+
 const starNodeWidth = computed(() => (viewportWidth.value <= 768 ? 150 : 180));
 const starNodeGap = computed(() => (viewportWidth.value <= 768 ? 28 : 58));
 
 const starNodes = computed(() => {
   const zOffsets = [-42, 24, -16, 46, -30, 18, -12, 36, -24, 40];
   const spacing = starNodeWidth.value + starNodeGap.value;
+  const timeline = starTimeline.some((node) => node.isEnding)
+    ? starTimeline
+    : [
+        ...starTimeline,
+        {
+          id: "star-ending",
+          date: "",
+          title: "To be continue...",
+          text: "To be continue...",
+          isEnding: true,
+        },
+      ];
 
-  const nodes = starTimeline.map((node, index) => ({
+  const nodes = timeline.map((node, index) => ({
     ...node,
     nodeKey: node.id || `${node.date}-${node.title}`,
     driftY: zOffsets[index % zOffsets.length],
@@ -86,6 +102,8 @@ const starStyle = (node, index) => ({
   "--entry-delay": `${index * 0.07}s`,
 });
 
+const isStarFlipped = (nodeKey) => Boolean(flippedStars[nodeKey]);
+
 const stopMomentum = () => {
   if (dragState.momentumId) {
     window.cancelAnimationFrame(dragState.momentumId);
@@ -122,8 +140,12 @@ const onPointerDown = (event) => {
   }
   event.preventDefault();
 
+  const hitCard = event.target.closest?.(".star-node");
+
   dragState.active = true;
+  dragState.moved = false;
   dragState.pointerId = event.pointerId;
+  dragState.pressedNodeKey = hitCard?.dataset.nodeKey || "";
   dragState.startX = event.clientX;
   dragState.startScrollLeft = container.scrollLeft;
   dragState.lastX = event.clientX;
@@ -142,6 +164,10 @@ const onPointerMove = (event) => {
   }
 
   const delta = event.clientX - dragState.startX;
+  if (Math.abs(delta) > 3) {
+    dragState.moved = true;
+  }
+
   container.scrollLeft = dragState.startScrollLeft - delta;
 
   const now = performance.now();
@@ -160,10 +186,21 @@ const onPointerUp = (event) => {
   if (container.hasPointerCapture(event.pointerId)) {
     container.releasePointerCapture(event.pointerId);
   }
+  container.classList.remove("dragging");
+
+  if (!dragState.moved && dragState.pressedNodeKey) {
+    const key = dragState.pressedNodeKey;
+    flippedStars[key] = !flippedStars[key];
+    dragState.velocity = 0;
+    stopMomentum();
+  } else {
+    startMomentum();
+  }
+
   dragState.active = false;
   dragState.pointerId = null;
-  container.classList.remove("dragging");
-  startMomentum();
+  dragState.pressedNodeKey = "";
+  dragState.moved = false;
 };
 
 const onPointerCancel = () => {
@@ -176,7 +213,9 @@ const onPointerCancel = () => {
     container.releasePointerCapture(dragState.pointerId);
   }
   dragState.active = false;
+  dragState.moved = false;
   dragState.pointerId = null;
+  dragState.pressedNodeKey = "";
   dragState.velocity = 0;
   container.classList.remove("dragging");
   stopMomentum();
@@ -226,17 +265,34 @@ onBeforeUnmount(() => {
       @pointerup="onPointerUp"
       @pointercancel="onPointerCancel"
     >
-      <div v-for="(node, index) in starNodes" :key="node.nodeKey" class="star-node" :style="starStyle(node, index)">
+      <div
+        v-for="(node, index) in starNodes"
+        :key="node.nodeKey"
+        class="star-node"
+        :class="{ 'is-flipped': isStarFlipped(node.nodeKey), 'is-ending': node.isEnding }"
+        :data-node-key="node.nodeKey"
+        :style="starStyle(node, index)"
+      >
         <span class="star-pin" aria-hidden="true"></span>
         <span class="star-thread" aria-hidden="true"></span>
         <span class="note-paper">
-          <span class="note-title">{{ node.title }}</span>
-          <span class="note-date">{{ node.date }}</span>
+          <span class="note-inner">
+            <span class="note-face note-front">
+              <template v-if="node.isEnding">
+                <span class="ending-note-text">{{ node.title }}</span>
+              </template>
+              <template v-else>
+                <span class="note-title">{{ node.title }}</span>
+                <span class="note-date">{{ node.date }}</span>
+              </template>
+            </span>
+            <span class="note-face note-back">
+              <span :class="node.isEnding ? 'ending-note-text' : 'note-text'">{{ node.text }}</span>
+            </span>
+          </span>
         </span>
       </div>
     </div>
-
-    <footer class="story-footer sky-footer">To be continue...</footer>
   </div>
 </template>
 

@@ -48,5 +48,12 @@ export const starTimeline = [
     title: "Future List",
     text: "A long list of dreams, with one rule: complete every item together.",
   },
+  {
+    id: "star-ending",
+    date: "",
+    title: "To be continue...",
+    text: "To be continue...",
+    isEnding: true,
+  },
 ];
 

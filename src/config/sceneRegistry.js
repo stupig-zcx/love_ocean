@@ -25,7 +25,7 @@ export const sceneRegistry = [
   },
   {
     id: "fragments",
-    enabled: true,
+    enabled: false,
     component: FragmentsScene,
     sparkleMode: "soft",
     musicKey: "fragments",
