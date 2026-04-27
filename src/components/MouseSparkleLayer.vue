@@ -15,9 +15,13 @@ let ctx;
 let animationId;
 const ambience = [];
 const trail = [];
-const mouse = { x: 0, y: 0, active: false };
+const travelStreamPoints = [];
+const mouse = { x: 0, y: 0, prevX: 0, prevY: 0, hasPrevious: false, active: false };
 let lastOceanTrailAt = 0;
 const MAX_TRAIL_ITEMS = 260;
+const MAX_TRAVEL_STREAM_POINTS = 34;
+const TRAVEL_STREAM_POINT_LIFE = 82;
+const TRAVEL_STREAM_MIN_DISTANCE = 5;
 
 const random = (min, max) => min + Math.random() * (max - min);
 
@@ -59,6 +63,10 @@ const rebuildAmbience = () => {
         alpha: random(0.08, 0.24),
       });
     }
+    return;
+  }
+
+  if (props.mode === "travel") {
     return;
   }
 
@@ -114,9 +122,35 @@ const spawnStarTrail = (x, y) => {
   }
 };
 
+const appendTravelStreamPoint = (x, y, dx, dy) => {
+  const distance = Math.hypot(dx, dy);
+  if (distance < TRAVEL_STREAM_MIN_DISTANCE) return;
+
+  travelStreamPoints.push({
+    x,
+    y,
+    life: TRAVEL_STREAM_POINT_LIFE,
+    maxLife: TRAVEL_STREAM_POINT_LIFE,
+    width: random(1.8, 3.2),
+    hue: random(116, 142),
+  });
+
+  if (travelStreamPoints.length > MAX_TRAVEL_STREAM_POINTS) {
+    travelStreamPoints.splice(0, travelStreamPoints.length - MAX_TRAVEL_STREAM_POINTS);
+  }
+};
+
 const onPointerMove = (event) => {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
+  const nextX = event.clientX;
+  const nextY = event.clientY;
+  const dx = mouse.hasPrevious ? nextX - mouse.x : 0;
+  const dy = mouse.hasPrevious ? nextY - mouse.y : 0;
+
+  mouse.prevX = mouse.x;
+  mouse.prevY = mouse.y;
+  mouse.x = nextX;
+  mouse.y = nextY;
+  mouse.hasPrevious = true;
   mouse.active = true;
 
   if (props.mode === "ocean") {
@@ -127,11 +161,14 @@ const onPointerMove = (event) => {
     }
   } else if (props.mode === "star") {
     spawnStarTrail(mouse.x, mouse.y);
+  } else if (props.mode === "travel") {
+    appendTravelStreamPoint(mouse.x, mouse.y, dx, dy);
   }
 };
 
 const onPointerLeave = () => {
   mouse.active = false;
+  mouse.hasPrevious = false;
 };
 
 const drawOcean = (width, height) => {
@@ -228,6 +265,69 @@ const drawStars = (softMode = false) => {
   }
 };
 
+const drawTravel = () => {
+  for (let i = travelStreamPoints.length - 1; i >= 0; i -= 1) {
+    travelStreamPoints[i].life -= 1;
+    if (travelStreamPoints[i].life <= 0) {
+      travelStreamPoints.splice(i, 1);
+    }
+  }
+
+  if (travelStreamPoints.length < 2) return;
+
+  const first = travelStreamPoints[0];
+  const head = travelStreamPoints[travelStreamPoints.length - 1];
+  const headAlpha = Math.min(0.92, head.life / head.maxLife);
+  const drawSmoothPath = () => {
+    ctx.beginPath();
+    ctx.moveTo(first.x, first.y);
+
+    for (let i = 1; i < travelStreamPoints.length - 1; i += 1) {
+      const point = travelStreamPoints[i];
+      const next = travelStreamPoints[i + 1];
+      const midX = (point.x + next.x) / 2;
+      const midY = (point.y + next.y) / 2;
+      ctx.quadraticCurveTo(point.x, point.y, midX, midY);
+    }
+
+    ctx.lineTo(head.x, head.y);
+  };
+  const gradient = ctx.createLinearGradient(first.x, first.y, head.x, head.y);
+  gradient.addColorStop(0, "hsla(128, 82%, 62%, 0)");
+  gradient.addColorStop(0.48, `hsla(132, 84%, 64%, ${headAlpha * 0.28})`);
+  gradient.addColorStop(0.86, `hsla(136, 88%, 68%, ${headAlpha * 0.72})`);
+  gradient.addColorStop(1, `hsla(140, 92%, 76%, ${headAlpha})`);
+
+  drawSmoothPath();
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = 3.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  drawSmoothPath();
+  ctx.strokeStyle = `hsla(140, 96%, 78%, ${headAlpha * 0.34})`;
+  ctx.lineWidth = 1.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  if (headAlpha > 0.08) {
+    const glow = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 16);
+    glow.addColorStop(0, `hsla(140, 96%, 78%, ${headAlpha * 0.45})`);
+    glow.addColorStop(1, "hsla(140, 96%, 78%, 0)");
+    ctx.beginPath();
+    ctx.arc(head.x, head.y, 16, 0, Math.PI * 2);
+    ctx.fillStyle = glow;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(head.x, head.y, 2.2, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(140, 96%, 82%, ${headAlpha})`;
+    ctx.fill();
+  }
+};
+
 const draw = () => {
   if (!ctx || !canvasRef.value) {
     return;
@@ -239,6 +339,8 @@ const draw = () => {
 
   if (props.mode === "ocean") {
     drawOcean(width, height);
+  } else if (props.mode === "travel") {
+    drawTravel();
   } else if (props.mode === "soft") {
     drawStars(true);
   } else {
@@ -252,6 +354,8 @@ watch(
   () => props.mode,
   () => {
     trail.length = 0;
+    travelStreamPoints.length = 0;
+    mouse.hasPrevious = false;
     rebuildAmbience();
   }
 );
