@@ -794,11 +794,11 @@ body {
 }
 
 .star-scroll::-webkit-scrollbar {
-  height: 9px;
+  height: 4px;
 }
 
 .star-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.36);
+  background: rgba(255, 255, 255, 0.42);
   border-radius: 999px;
 }
 
@@ -811,12 +811,13 @@ body {
   background: transparent;
   color: #fff;
   position: relative;
-  cursor: default;
+  cursor: pointer;
   transform: translateY(var(--drift-y));
   transition: transform 0.2s ease;
   animation: starNodeIn 0.65s ease both;
   animation-delay: var(--entry-delay);
-  pointer-events: none;
+  pointer-events: auto;
+  perspective: 1000px;
 }
 
 .star-node:hover {
@@ -870,7 +871,26 @@ body {
   top: 138px;
   transform: translateX(-50%) rotate(var(--paper-tilt));
   width: 124px;
-  min-height: 74px;
+  min-height: 84px;
+  height: 84px;
+  z-index: 1;
+}
+
+.note-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.star-node.is-flipped .note-inner {
+  transform: rotateY(180deg);
+}
+
+.note-face {
+  position: absolute;
+  inset: 0;
   border-radius: 4px;
   border: 1px solid rgba(86, 72, 48, 0.22);
   background: linear-gradient(180deg, #f8f1df 0%, #f4ead2 100%);
@@ -880,20 +900,56 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 1;
+  backface-visibility: hidden;
+}
+
+.note-front {
+  justify-content: center;
+}
+
+.note-back {
+  transform: rotateY(180deg);
+  justify-content: flex-start;
 }
 
 .note-date {
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   letter-spacing: 0.11em;
   color: #74664f;
+  text-transform: uppercase;
 }
 
 .note-title {
   font-family: "Nunito", "Microsoft YaHei", sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   line-height: 1.24;
   font-weight: 700;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-text {
+  font-size: 0.66rem;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: #655640;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.star-end-caption {
+  flex: 0 0 auto;
+  margin-left: 18px;
+  padding-right: 28px;
+  white-space: nowrap;
+  font-family: "ZCOOL KuaiLe", cursive;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  letter-spacing: 0.08em;
+  color: rgba(246, 247, 255, 0.92);
 }
 
 .fragments-content,
@@ -953,46 +1009,91 @@ body {
   position: relative;
   z-index: 1;
   flex: 1;
-  width: min(96vw, 1260px);
-  margin: 28px auto 0;
-  padding: 12px 14px 8px;
+  width: min(98vw, 1460px);
+  margin: 18px auto 0;
+  padding: 8px 10px 8px;
   border-radius: 16px;
   background: rgba(6, 19, 15, 0.34);
   border: 1px solid rgba(182, 236, 211, 0.22);
 }
 
+.travel-map-layout {
+  display: grid;
+  grid-template-columns: minmax(520px, 820px) minmax(300px, 340px);
+  justify-content: center;
+  align-items: center;
+  gap: clamp(4px, 0.8vw, 12px);
+  min-height: 0;
+  transform: translateX(-36px);
+}
+
+.travel-map-main {
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: 100%;
+  gap: 12px;
+  min-width: 0;
+}
+
 .travel-map-svg {
   width: 100%;
-  height: min(58vh, 520px);
+  height: min(62vh, 620px);
   display: block;
+  filter: drop-shadow(0 20px 36px rgba(0, 0, 0, 0.26));
 }
 
-.province-tile {
-  cursor: default;
+.province-region {
+  cursor: pointer;
+  outline: none;
 }
 
-.province-tile rect {
-  fill: rgba(163, 187, 177, 0.36);
-  stroke: rgba(199, 233, 219, 0.36);
-  stroke-width: 1.1;
-  transition: fill 0.25s ease, stroke 0.25s ease;
+.province-path {
+  fill: rgba(79, 104, 94, 0.42);
+  stroke: rgba(205, 235, 222, 0.48);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: fill 0.24s ease, stroke 0.24s ease, filter 0.24s ease;
 }
 
-.province-tile text {
-  fill: rgba(237, 246, 241, 0.86);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  pointer-events: none;
+.province-region:hover .province-path {
+  fill: rgba(164, 210, 188, 0.58);
+  stroke: rgba(241, 255, 249, 0.88);
+  filter: drop-shadow(0 0 8px rgba(200, 255, 224, 0.24));
 }
 
-.province-tile.visited rect {
-  fill: rgba(127, 235, 181, 0.86);
+.province-region:focus-visible .province-path {
+  stroke: rgba(241, 255, 249, 0.88);
+  filter: drop-shadow(0 0 8px rgba(200, 255, 224, 0.24));
+}
+
+.province-region.visited .province-path {
+  fill: rgba(127, 235, 181, 0.88);
   stroke: rgba(231, 255, 245, 0.95);
+  filter: drop-shadow(0 0 8px rgba(127, 235, 181, 0.3));
 }
 
-.province-tile.visited text {
-  fill: #102a1f;
+.province-region.visited:hover .province-path {
+  fill: rgba(174, 252, 210, 0.96);
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 12px rgba(174, 252, 210, 0.5));
+}
+
+.province-region.visited:focus-visible .province-path {
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 12px rgba(174, 252, 210, 0.5));
+}
+
+.province-region.selected .province-path {
+  stroke: #ffffff;
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 14px rgba(174, 252, 210, 0.52));
+}
+
+.map-loading-label {
+  fill: rgba(226, 244, 234, 0.78);
+  font-size: 22px;
+  letter-spacing: 0.08em;
 }
 
 .travel-stats {
@@ -1010,8 +1111,128 @@ body {
   color: rgba(220, 244, 229, 0.95);
 }
 
+.travel-detail-panel {
+  display: grid;
+  grid-template-rows: 210px 230px;
+  align-content: center;
+  justify-self: start;
+  width: min(100%, 330px);
+  gap: clamp(10px, 1.4vh, 14px);
+  min-width: 0;
+  transform: none;
+}
+
+.province-preview-frame {
+  border: 1px solid rgba(210, 245, 226, 0.24);
+  background:
+    linear-gradient(135deg, rgba(243, 255, 247, 0.1), rgba(18, 54, 38, 0.1)),
+    rgba(5, 20, 15, 0.42);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+}
+
+.province-preview-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  justify-self: center;
+  width: min(100%, 320px);
+  height: 210px;
+}
+
+.province-preview-svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.24));
+}
+
+.province-preview-path {
+  fill: rgba(150, 196, 174, 0.62);
+  stroke: rgba(241, 255, 249, 0.88);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.province-preview-empty {
+  fill: rgba(226, 244, 234, 0.68);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+}
+
+.travel-note-panel {
+  box-sizing: border-box;
+  justify-self: center;
+  width: min(100%, 320px);
+  height: 230px;
+  padding: 0 clamp(4px, 1.2vw, 12px);
+  color: rgba(235, 248, 240, 0.94);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.travel-note-panel.empty {
+  color: rgba(230, 244, 236, 0.78);
+}
+
+.travel-note-date {
+  margin: 0 0 8px;
+  font-family: "Nunito", "Microsoft YaHei", sans-serif;
+  font-size: 0.86rem;
+  letter-spacing: 0.08em;
+  color: rgba(219, 248, 232, 0.72);
+}
+
+.travel-province-name {
+  margin: 0;
+  font-family: "ZCOOL KuaiLe", "Microsoft YaHei", sans-serif;
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+  line-height: 0.98;
+  color: #f5fff8;
+}
+
+.travel-note-title {
+  margin: 14px 0 0;
+  font-size: clamp(0.98rem, 1.4vw, 1.16rem);
+  line-height: 1.45;
+  color: rgba(218, 244, 229, 0.84);
+}
+
+.travel-note-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  font-size: 0.94rem;
+  line-height: 1.72;
+  color: rgba(234, 248, 239, 0.86);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 8px;
+  min-height: 0;
+}
+
+.travel-note-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.travel-note-list::-webkit-scrollbar-thumb {
+  background: rgba(211, 244, 226, 0.28);
+  border-radius: 999px;
+}
+
+.travel-note-list li::before {
+  content: "\00b7";
+  margin-right: 8px;
+  color: rgba(157, 238, 193, 0.92);
+  font-weight: 700;
+}
+
 .travel-legend {
-  margin-top: 8px;
+  margin-top: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1221,6 +1442,22 @@ body {
   .note-paper {
     width: 112px;
     top: 130px;
+    min-height: 76px;
+    height: 76px;
+  }
+
+  .note-title {
+    font-size: 0.78rem;
+  }
+
+  .note-date,
+  .note-text {
+    font-size: 0.62rem;
+  }
+
+  .star-end-caption {
+    font-size: 0.98rem;
+    padding-right: 16px;
   }
 
   .fragments-stage {
@@ -1247,12 +1484,41 @@ body {
     margin-top: 20px;
   }
 
-  .travel-map-svg {
-    height: min(52vh, 420px);
+  .travel-map-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    transform: none;
   }
 
-  .province-tile text {
-    font-size: 10px;
+  .travel-map-svg {
+    height: min(45vh, 380px);
+  }
+
+  .travel-detail-panel {
+    grid-template-rows: 180px 220px;
+    gap: 10px;
+    width: min(100%, 320px);
+    transform: none;
+  }
+
+  .province-preview-frame {
+    width: min(100%, 300px);
+    height: 180px;
+  }
+
+  .travel-note-panel {
+    width: min(100%, 300px);
+    height: 220px;
+    padding: 0 8px;
+  }
+
+  .travel-province-name {
+    font-size: 1.85rem;
+  }
+
+  .travel-note-list {
+    font-size: 0.86rem;
+    line-height: 1.65;
   }
 
   .travel-hover {
