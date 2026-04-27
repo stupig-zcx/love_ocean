@@ -36,7 +36,7 @@ export const sceneRegistry = [
     id: "travel",
     enabled: true,
     component: TravelMapScene,
-    sparkleMode: "soft",
+    sparkleMode: "travel",
     musicKey: "travel",
     panelClass: "travel-panel",
     ariaLabel: "China Travel Map Scene",
