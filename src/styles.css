@@ -711,6 +711,30 @@ body {
   flex-direction: column;
 }
 
+.fragments-panel {
+  position: relative;
+  color: #f7f9ff;
+  padding: min(9vh, 78px) 18px 30px;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 8% 14%, rgba(255, 183, 222, 0.2), transparent 24%),
+    radial-gradient(circle at 90% 22%, rgba(168, 224, 255, 0.2), transparent 28%),
+    linear-gradient(180deg, #16172b 0%, #1f2742 48%, #272f4f 100%);
+}
+
+.travel-panel {
+  position: relative;
+  color: #eef7ef;
+  padding: min(9vh, 78px) 18px 30px;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(185, 242, 210, 0.2), transparent 26%),
+    radial-gradient(circle at 86% 22%, rgba(168, 224, 255, 0.18), transparent 30%),
+    linear-gradient(180deg, #102622 0%, #16362f 52%, #1b453a 100%);
+}
+
 .sky-panel::before {
   content: "";
   position: absolute;
@@ -787,11 +811,12 @@ body {
   background: transparent;
   color: #fff;
   position: relative;
-  cursor: pointer;
+  cursor: default;
   transform: translateY(var(--drift-y));
   transition: transform 0.2s ease;
   animation: starNodeIn 0.65s ease both;
   animation-delay: var(--entry-delay);
+  pointer-events: none;
 }
 
 .star-node:hover {
@@ -869,6 +894,143 @@ body {
   font-size: 0.82rem;
   line-height: 1.24;
   font-weight: 700;
+}
+
+.fragments-content,
+.travel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.fragments-stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: min(96vw, 1180px);
+  margin: 30px auto 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  align-content: start;
+  overflow: auto;
+  padding: 6px 4px 12px;
+}
+
+.fragment-card {
+  border-radius: 12px;
+  min-height: 150px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(255, 247, 225, 0.98) 0%, rgba(246, 234, 204, 0.96) 100%);
+  color: #433927;
+  border: 1px solid rgba(112, 90, 62, 0.22);
+  box-shadow: 0 10px 24px rgba(6, 9, 25, 0.32);
+  transform: rotate(var(--tilt)) translateY(var(--drift));
+}
+
+.fragment-date {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: #786953;
+}
+
+.fragment-card h3 {
+  margin: 7px 0 8px;
+  font-size: 1rem;
+  color: #3a2f21;
+}
+
+.fragment-text {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #4f4433;
+}
+
+.travel-map-stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: min(96vw, 1260px);
+  margin: 28px auto 0;
+  padding: 12px 14px 8px;
+  border-radius: 16px;
+  background: rgba(6, 19, 15, 0.34);
+  border: 1px solid rgba(182, 236, 211, 0.22);
+}
+
+.travel-map-svg {
+  width: 100%;
+  height: min(58vh, 520px);
+  display: block;
+}
+
+.province-tile {
+  cursor: default;
+}
+
+.province-tile rect {
+  fill: rgba(163, 187, 177, 0.36);
+  stroke: rgba(199, 233, 219, 0.36);
+  stroke-width: 1.1;
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+
+.province-tile text {
+  fill: rgba(237, 246, 241, 0.86);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+.province-tile.visited rect {
+  fill: rgba(127, 235, 181, 0.86);
+  stroke: rgba(231, 255, 245, 0.95);
+}
+
+.province-tile.visited text {
+  fill: #102a1f;
+}
+
+.travel-stats {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: rgba(228, 244, 235, 0.9);
+}
+
+.travel-hover {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(220, 244, 229, 0.95);
+}
+
+.travel-legend {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: rgba(222, 241, 230, 0.88);
+  font-size: 0.82rem;
+}
+
+.legend-chip {
+  width: 16px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(163, 187, 177, 0.36);
+  border: 1px solid rgba(199, 233, 219, 0.36);
+}
+
+.legend-chip.visited {
+  background: rgba(127, 235, 181, 0.86);
+  border-color: rgba(231, 255, 245, 0.95);
 }
 
 .story-footer {
@@ -1041,6 +1203,11 @@ body {
     padding-top: 70px;
   }
 
+  .fragments-panel,
+  .travel-panel {
+    padding-top: 70px;
+  }
+
   .star-scroll {
     --node-width: 150px;
     --node-gap: 28px;
@@ -1054,6 +1221,42 @@ body {
   .note-paper {
     width: 112px;
     top: 130px;
+  }
+
+  .fragments-stage {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .fragment-card {
+    min-height: 128px;
+    padding: 10px 10px;
+  }
+
+  .fragment-card h3 {
+    font-size: 0.92rem;
+  }
+
+  .fragment-text {
+    font-size: 0.78rem;
+  }
+
+  .travel-map-stage {
+    padding: 8px;
+    margin-top: 20px;
+  }
+
+  .travel-map-svg {
+    height: min(52vh, 420px);
+  }
+
+  .province-tile text {
+    font-size: 10px;
+  }
+
+  .travel-hover {
+    font-size: 0.82rem;
   }
 
   .music-toggle {

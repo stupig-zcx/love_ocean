@@ -1,7 +1,7 @@
 ﻿<script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-// Scene-aware background canvas: ocean bubbles (scene 1) and star particles (scene 2).
+// Scene-aware background canvas: ocean bubbles, star particles, and soft ambience.
 const props = defineProps({
   mode: {
     type: String,
@@ -62,7 +62,8 @@ const rebuildAmbience = () => {
     return;
   }
 
-  for (let i = 0; i < 120; i += 1) {
+  const count = props.mode === "soft" ? 72 : 120;
+  for (let i = 0; i < count; i += 1) {
     ambience.push({
       x: random(0, width),
       y: random(0, height),
@@ -124,7 +125,7 @@ const onPointerMove = (event) => {
       spawnOceanTrail(mouse.x, mouse.y);
       lastOceanTrailAt = now;
     }
-  } else {
+  } else if (props.mode === "star") {
     spawnStarTrail(mouse.x, mouse.y);
   }
 };
@@ -183,15 +184,21 @@ const drawOcean = (width, height) => {
   }
 };
 
-const drawStars = () => {
+const drawStars = (softMode = false) => {
   for (const item of ambience) {
     item.twinkle += item.speed;
-    const alpha = item.alpha + Math.sin(item.twinkle) * 0.14;
+    const alpha = item.alpha + Math.sin(item.twinkle) * (softMode ? 0.08 : 0.14);
 
     ctx.beginPath();
-    ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.06, alpha)})`;
+    ctx.arc(item.x, item.y, softMode ? item.r * 1.2 : item.r, 0, Math.PI * 2);
+    ctx.fillStyle = softMode
+      ? `rgba(218, 236, 255, ${Math.max(0.05, alpha * 0.78)})`
+      : `rgba(255, 255, 255, ${Math.max(0.06, alpha)})`;
     ctx.fill();
+  }
+
+  if (softMode) {
+    return;
   }
 
   for (let i = trail.length - 1; i >= 0; i -= 1) {
@@ -232,8 +239,10 @@ const draw = () => {
 
   if (props.mode === "ocean") {
     drawOcean(width, height);
+  } else if (props.mode === "soft") {
+    drawStars(true);
   } else {
-    drawStars();
+    drawStars(false);
   }
 
   animationId = window.requestAnimationFrame(draw);

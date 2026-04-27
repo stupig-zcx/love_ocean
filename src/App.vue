@@ -1,29 +1,26 @@
-﻿<script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
-import FishNode from "./components/FishNode.vue";
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import IntroOverlay from "./components/IntroOverlay.vue";
 import MouseSparkleLayer from "./components/MouseSparkleLayer.vue";
 import StoryModal from "./components/StoryModal.vue";
-import { useFishSchool } from "./composables/useFishSchool";
-import { stories as storySeed } from "./data/stories";
-import { starTimeline } from "./data/starTimeline";
+import { sceneRegistry } from "./config/sceneRegistry";
 
-// Global UI state
+// Global app state
 const introVisible = ref(true);
 const modalOpen = ref(false);
 const activeStory = ref(null);
-const stories = ref(storySeed);
-const oceanStageRef = ref(null);
 const sceneScrollRef = ref(null);
-const starScrollRef = ref(null);
-const oceanAudioRef = ref(null);
-const skyAudioRef = ref(null);
-const inSkyScene = ref(false);
+const backgroundAudioRef = ref(null);
+const activeSceneIndex = ref(0);
 const musicEnabled = ref(true);
 const audioUnlocked = ref(false);
-const viewportWidth = ref(typeof window !== "undefined" ? window.innerWidth : 1280);
 
-// Resolve scene music files from local audio folder
+// Scene registry (enabled decides whether to render in frontend)
+const enabledScenes = computed(() => sceneRegistry.filter((scene) => scene.enabled));
+const activeScene = computed(() => enabledScenes.value[activeSceneIndex.value] || enabledScenes.value[0] || null);
+const activeSparkleMode = computed(() => activeScene.value?.sparkleMode || "soft");
+
+// Resolve local audio files once at startup.
 const audioModules = import.meta.glob("./audio/*.{mp3,wav,ogg,m4a,aac,flac}", {
   eager: true,
   import: "default",
@@ -35,99 +32,24 @@ const audioByName = Object.entries(audioModules).reduce((acc, [path, source]) =>
   return acc;
 }, {});
 
-const oceanMusicSrc =
-  audioByName["ocean.mp3"] || audioByName["sea.mp3"] || audioByName["ocean.wav"] || "";
-const skyMusicSrc =
-  audioByName["sky.mp3"] || audioByName["stars.mp3"] || audioByName["sky.wav"] || "";
-const hasMusic = computed(() => Boolean(oceanMusicSrc || skyMusicSrc));
+const pickAudioSource = (...fileNames) => fileNames.map((name) => audioByName[name]).find(Boolean) || "";
 
-// Header profile metadata
-const loveProfile = {
-  chenBirthday: "05.02",
-  yiBirthday: "03.23",
-  togetherSince: "2026-04-06",
+const musicByKey = {
+  ocean: pickAudioSource("ocean.mp3", "sea.mp3", "ocean.wav"),
+  sky: pickAudioSource("sky.mp3", "stars.mp3", "sky.wav"),
+  fragments: pickAudioSource("fragments.mp3", "memory.mp3", "fragments.wav"),
+  travel: pickAudioSource("travel.mp3", "map.mp3", "travel.wav"),
 };
 
-const togetherDays = computed(() => {
-  const start = new Date(`${loveProfile.togetherSince}T00:00:00`);
-  const startTime = start.getTime();
-  if (Number.isNaN(startTime)) {
-    return "--";
-  }
-  const elapsed = Date.now() - startTime;
-  return Math.max(1, Math.floor(elapsed / 86400000) + 1);
-});
-
-const dragState = {
-  active: false,
-  moved: false,
-  pointerId: null,
-  startX: 0,
-  startScrollLeft: 0,
-  lastX: 0,
-  lastTime: 0,
-  velocity: 0,
-  momentumId: null,
+const musicVolumeByKey = {
+  ocean: 0.72,
+  sky: 0.58,
+  fragments: 0.54,
+  travel: 0.62,
 };
-// Each star card keeps its own front/back flip state.
-const flippedStars = reactive({});
-let resizeRafId = 0;
 
-const { fishNodes } = useFishSchool(stories, oceanStageRef);
-const starNodeWidth = computed(() => (viewportWidth.value <= 768 ? 150 : 180));
-const starNodeGap = computed(() => (viewportWidth.value <= 768 ? 28 : 58));
-
-const starNodes = computed(() => {
-  // Create a z-like vertical rhythm for the horizontal timeline.
-  const zOffsets = [-42, 24, -16, 46, -30, 18, -12, 36, -24, 40];
-  const spacing = starNodeWidth.value + starNodeGap.value;
-
-  const nodes = starTimeline.map((node, index) => ({
-    ...node,
-    nodeKey: node.id || `${node.date}-${node.title}`,
-    driftY: zOffsets[index % zOffsets.length],
-    paperTilt: ((index * 9) % 10) - 5,
-    pinSize: 24 + ((index * 7) % 10),
-  }));
-
-  return nodes.map((node, index) => {
-    const nextNode = nodes[index + 1];
-    if (!nextNode) {
-      return {
-        ...node,
-        linkAngle: 0,
-        linkLength: 0,
-      };
-    }
-
-    const currentY = node.driftY + 18 + node.pinSize * 0.5;
-    const nextY = nextNode.driftY + 18 + nextNode.pinSize * 0.5;
-    const deltaY = nextY - currentY;
-
-    return {
-      ...node,
-      linkLength: Math.hypot(spacing, deltaY),
-      linkAngle: (Math.atan2(deltaY, spacing) * 180) / Math.PI,
-    };
-  });
-});
-
-const fishStyle = (fish) => ({
-  left: `${fish.x}px`,
-  top: `${fish.y}px`,
-  "--size": `${fish.size}px`,
-  "--angle": `${fish.angle}rad`,
-  "--tilt": `${fish.tilt}deg`,
-});
-
-const starStyle = (node, index) => ({
-  "--drift-y": `${node.driftY}px`,
-  "--paper-tilt": `${node.paperTilt}deg`,
-  "--pin-size": `${node.pinSize}px`,
-  "--link-length": `${node.linkLength}px`,
-  "--link-angle": `${node.linkAngle}deg`,
-  "--entry-delay": `${index * 0.07}s`,
-});
+const hasMusic = computed(() => Object.values(musicByKey).some(Boolean));
+const currentMusicSrc = computed(() => (activeScene.value ? musicByKey[activeScene.value.musicKey] || "" : ""));
 
 const openStory = (story) => {
   activeStory.value = story;
@@ -146,14 +68,24 @@ const onEsc = (event) => {
   }
 };
 
-const onSceneScroll = () => {
-  const scene = sceneScrollRef.value;
-  if (!scene) {
+// Scene activation follows the nearest full-screen panel.
+const syncActiveScene = () => {
+  const container = sceneScrollRef.value;
+  if (!container) {
     return;
   }
-  const nextInSkyScene = scene.scrollTop > window.innerHeight * 0.35;
-  if (nextInSkyScene !== inSkyScene.value) {
-    inSkyScene.value = nextInSkyScene;
+
+  const sceneCount = enabledScenes.value.length;
+  if (!sceneCount) {
+    activeSceneIndex.value = 0;
+    return;
+  }
+
+  const nextIndex = Math.round(container.scrollTop / window.innerHeight);
+  const normalizedIndex = Math.min(sceneCount - 1, Math.max(0, nextIndex));
+
+  if (normalizedIndex !== activeSceneIndex.value) {
+    activeSceneIndex.value = normalizedIndex;
   }
 };
 
@@ -163,7 +95,6 @@ const pauseAudio = (audio) => {
   }
 };
 
-// Audio playback helper for scene-based background music.
 const playAudioSafe = async (audio) => {
   if (!audio || !audio.src) {
     return;
@@ -176,22 +107,26 @@ const playAudioSafe = async (audio) => {
 };
 
 const syncSceneMusic = async () => {
-  const oceanAudio = oceanAudioRef.value;
-  const skyAudio = skyAudioRef.value;
-
-  if (!hasMusic.value || !musicEnabled.value || !audioUnlocked.value) {
-    pauseAudio(oceanAudio);
-    pauseAudio(skyAudio);
+  const audio = backgroundAudioRef.value;
+  if (!audio) {
     return;
   }
 
-  if (inSkyScene.value) {
-    pauseAudio(oceanAudio);
-    await playAudioSafe(skyAudio);
-  } else {
-    pauseAudio(skyAudio);
-    await playAudioSafe(oceanAudio);
+  if (!hasMusic.value || !musicEnabled.value || !audioUnlocked.value || !currentMusicSrc.value) {
+    pauseAudio(audio);
+    return;
   }
+
+  if (audio.dataset.currentSrc !== currentMusicSrc.value) {
+    audio.src = currentMusicSrc.value;
+    audio.dataset.currentSrc = currentMusicSrc.value;
+    audio.currentTime = 0;
+  }
+
+  const key = activeScene.value?.musicKey || "";
+  audio.volume = musicVolumeByKey[key] ?? 0.62;
+
+  await playAudioSafe(audio);
 };
 
 const toggleMusic = () => {
@@ -201,138 +136,23 @@ const toggleMusic = () => {
   musicEnabled.value = !musicEnabled.value;
 };
 
-const stopMomentum = () => {
-  if (dragState.momentumId) {
-    window.cancelAnimationFrame(dragState.momentumId);
-    dragState.momentumId = null;
-  }
-};
-
-// Inertial horizontal dragging for Scene 2 timeline.
-const startMomentum = () => {
-  const container = starScrollRef.value;
-  if (!container) {
-    return;
-  }
-
-  stopMomentum();
-
-  const tick = () => {
-    if (Math.abs(dragState.velocity) < 0.05) {
-      stopMomentum();
-      return;
-    }
-
-    container.scrollLeft -= dragState.velocity * 16;
-    dragState.velocity *= 0.93;
-    dragState.momentumId = window.requestAnimationFrame(tick);
-  };
-
-  dragState.momentumId = window.requestAnimationFrame(tick);
-};
-
-const onStarPointerDown = (event) => {
-  const container = starScrollRef.value;
-  if (!container) {
-    return;
-  }
-  event.preventDefault();
-
-  dragState.active = true;
-  dragState.moved = false;
-  dragState.pointerId = event.pointerId;
-  dragState.startX = event.clientX;
-  dragState.startScrollLeft = container.scrollLeft;
-  dragState.lastX = event.clientX;
-  dragState.lastTime = performance.now();
-  dragState.velocity = 0;
-
-  stopMomentum();
-
-  container.classList.add("dragging");
-  container.setPointerCapture(event.pointerId);
-};
-
-const onStarPointerMove = (event) => {
-  const container = starScrollRef.value;
-  if (!container || !dragState.active || dragState.pointerId !== event.pointerId) {
-    return;
-  }
-
-  const delta = event.clientX - dragState.startX;
-  if (Math.abs(delta) > 3) {
-    dragState.moved = true;
-  }
-
-  container.scrollLeft = dragState.startScrollLeft - delta;
-
-  const now = performance.now();
-  const dt = Math.max(1, now - dragState.lastTime);
-  dragState.velocity = (event.clientX - dragState.lastX) / dt;
-  dragState.lastX = event.clientX;
-  dragState.lastTime = now;
-};
-
-const onStarPointerUp = (event) => {
-  const container = starScrollRef.value;
-  if (!container || dragState.pointerId !== event.pointerId) {
-    return;
-  }
-
-  if (container.hasPointerCapture(event.pointerId)) {
-    container.releasePointerCapture(event.pointerId);
-  }
-  dragState.active = false;
-  dragState.pointerId = null;
-  container.classList.remove("dragging");
-  startMomentum();
-};
-
-const onStarPointerCancel = () => {
-  const container = starScrollRef.value;
-  if (!container) {
-    return;
-  }
-
-  if (dragState.pointerId !== null && container.hasPointerCapture(dragState.pointerId)) {
-    container.releasePointerCapture(dragState.pointerId);
-  }
-  dragState.active = false;
-  dragState.pointerId = null;
-  dragState.velocity = 0;
-  container.classList.remove("dragging");
-  stopMomentum();
-};
-
-const onStarClick = (event, node) => {
-  if (dragState.moved) {
-    event.preventDefault();
-    return;
-  }
-  flippedStars[node.nodeKey] = !flippedStars[node.nodeKey];
-};
-
-const isStarFlipped = (nodeKey) => Boolean(flippedStars[nodeKey]);
-
-// Browser gesture unlock for autoplay-restricted audio.
 const unlockAudio = () => {
   audioUnlocked.value = true;
   syncSceneMusic();
 };
 
-const onWindowResize = () => {
-  // Throttle resize updates to animation frames to avoid reactive churn.
-  if (resizeRafId) {
+watch([activeSceneIndex, musicEnabled, audioUnlocked, currentMusicSrc], () => {
+  syncSceneMusic();
+});
+
+watch(enabledScenes, (list) => {
+  if (!list.length) {
+    activeSceneIndex.value = 0;
     return;
   }
-  resizeRafId = window.requestAnimationFrame(() => {
-    viewportWidth.value = window.innerWidth;
-    resizeRafId = 0;
-  });
-};
-
-watch([inSkyScene, musicEnabled, audioUnlocked], () => {
-  syncSceneMusic();
+  if (activeSceneIndex.value > list.length - 1) {
+    activeSceneIndex.value = list.length - 1;
+  }
 });
 
 onMounted(() => {
@@ -342,111 +162,48 @@ onMounted(() => {
 
   window.addEventListener("pointerdown", unlockAudio, { once: true });
   window.addEventListener("keydown", onEsc);
-  window.addEventListener("resize", onWindowResize);
+  window.addEventListener("resize", syncActiveScene);
+  window.requestAnimationFrame(syncActiveScene);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("pointerdown", unlockAudio);
   window.removeEventListener("keydown", onEsc);
-  window.removeEventListener("resize", onWindowResize);
+  window.removeEventListener("resize", syncActiveScene);
   document.body.style.overflow = "";
-  pauseAudio(oceanAudioRef.value);
-  pauseAudio(skyAudioRef.value);
-  if (resizeRafId) {
-    window.cancelAnimationFrame(resizeRafId);
-  }
-  stopMomentum();
+  pauseAudio(backgroundAudioRef.value);
 });
 </script>
 
 <template>
   <div>
     <!-- Global visual layers -->
-    <MouseSparkleLayer :mode="inSkyScene ? 'star' : 'ocean'" />
+    <MouseSparkleLayer :mode="activeSparkleMode" />
     <IntroOverlay :visible="introVisible" />
 
-    <!-- Scene background music players -->
-    <audio ref="oceanAudioRef" :src="oceanMusicSrc || undefined" loop preload="auto"></audio>
-    <audio ref="skyAudioRef" :src="skyMusicSrc || undefined" loop preload="auto"></audio>
+    <!-- Scene background music player -->
+    <audio ref="backgroundAudioRef" loop preload="auto"></audio>
 
     <!-- Manual music switch -->
     <button class="music-toggle" type="button" :disabled="!hasMusic" @click="toggleMusic">
-      {{ !hasMusic ? "无音乐文件" : musicEnabled ? "音乐: 开" : "音乐: 关" }}
+      {{ !hasMusic ? "Music: N/A" : musicEnabled ? "Music: On" : "Music: Off" }}
     </button>
 
-    <!-- Scene 1 + Scene 2 container -->
-    <div ref="sceneScrollRef" class="scene-scroll" :class="{ ready: !introVisible }" @scroll.passive="onSceneScroll">
-      <!-- Scene 1: ocean fish memories -->
-      <section class="scene-panel ocean-panel">
-        <main class="story-world ocean-world" aria-label="恋爱海洋故事">
-          <header class="hero">
-            <p class="hero-subtitle">OUR OCEAN LOVE STORY</p>
-            <h2>在蓝色海洋里，遇见每一段心动回忆</h2>
-            <h4>点击抓捕小鱼，查看珍贵回忆瞬间</h4>
-          </header>
-
-          <section ref="oceanStageRef" class="ocean-stage" aria-label="游动故事鱼群">
-            <FishNode
-              v-for="fish in fishNodes"
-              :key="`fish-${fish.index}`"
-              :fish="fish"
-              :style-object="fishStyle(fish)"
-              @open="openStory"
-            />
-          </section>
-        </main>
-      </section>
-
-      <!-- Scene 2: horizontal star timeline -->
-      <section class="scene-panel sky-panel" aria-label="星空时间线">
-        <header class="sky-header">
-          <p class="hero-subtitle sky-subtitle">OUR STAR MAP</p>
-          <h2>在广袤星空中，查看独属于我们的时间线</h2>
-          <h4>左右拖动星空查看时间节点</h4>
-          <p class="love-meta">
-            Chen {{ loveProfile.chenBirthday }} · Yi {{ loveProfile.yiBirthday }} · Together since {{ loveProfile.togetherSince }} ·  lasts for {{ togetherDays }} days
-          </p>
-        </header>
-
-        <div
-          ref="starScrollRef"
-          class="star-scroll"
-          aria-label="星空时间节点横向轴"
-          @pointerdown="onStarPointerDown"
-          @pointermove="onStarPointerMove"
-          @pointerup="onStarPointerUp"
-          @pointercancel="onStarPointerCancel"
-        >
-          <button
-            v-for="(node, index) in starNodes"
-            :key="node.nodeKey"
-            class="star-node"
-            :class="{ 'is-flipped': isStarFlipped(node.nodeKey) }"
-            :style="starStyle(node, index)"
-            :aria-pressed="isStarFlipped(node.nodeKey)"
-            @click="onStarClick($event, node)"
-          >
-            <span class="star-pin" aria-hidden="true"></span>
-            <span class="star-thread" aria-hidden="true"></span>
-            <span class="note-paper">
-              <span class="note-inner">
-                <span class="note-face note-front">
-                  <span class="note-title">{{ node.title }}</span>
-                  <span class="note-date">{{ node.date }}</span>
-                </span>
-                <span class="note-face note-back">
-                  <span class="note-text">{{ node.text }}</span>
-                </span>
-              </span>
-            </span>
-          </button>
-        </div>
-
-        <footer class="story-footer sky-footer">To be continue...</footer>
+    <!-- Scenes container -->
+    <div ref="sceneScrollRef" class="scene-scroll" :class="{ ready: !introVisible }" @scroll.passive="syncActiveScene">
+      <section
+        v-for="(scene, index) in enabledScenes"
+        :key="scene.id"
+        class="scene-panel"
+        :class="scene.panelClass"
+        :aria-label="scene.ariaLabel"
+      >
+        <component :is="scene.component" :active="index === activeSceneIndex" @open-story="openStory" />
       </section>
     </div>
 
-    <!-- Full-screen story modal (used by scene 1 fish nodes) -->
+    <!-- Full-screen story modal (used by Scene 1 currently) -->
     <StoryModal :open="modalOpen" :story="activeStory" @close="closeStory" />
   </div>
 </template>
+

@@ -1,0 +1,41 @@
+// Province tile coordinates for built-in China travel map scene.
+export const provinceTiles = [
+  { code: "XJ", name: "新疆", short: "新", x: 0, y: 2 },
+  { code: "XZ", name: "西藏", short: "藏", x: 1, y: 4 },
+  { code: "QH", name: "青海", short: "青", x: 2, y: 3 },
+  { code: "GS", name: "甘肃", short: "甘", x: 3, y: 2 },
+  { code: "NX", name: "宁夏", short: "宁", x: 4, y: 2 },
+  { code: "NM", name: "内蒙古", short: "蒙", x: 5, y: 1 },
+  { code: "SN", name: "陕西", short: "陕", x: 5, y: 3 },
+  { code: "SX", name: "山西", short: "晋", x: 6, y: 2 },
+  { code: "HE", name: "河北", short: "冀", x: 7, y: 2 },
+  { code: "BJ", name: "北京", short: "京", x: 8, y: 2 },
+  { code: "TJ", name: "天津", short: "津", x: 9, y: 2 },
+  { code: "LN", name: "辽宁", short: "辽", x: 9, y: 1 },
+  { code: "JL", name: "吉林", short: "吉", x: 10, y: 1 },
+  { code: "HL", name: "黑龙江", short: "黑", x: 11, y: 1 },
+  { code: "SD", name: "山东", short: "鲁", x: 8, y: 3 },
+  { code: "HA", name: "河南", short: "豫", x: 7, y: 3 },
+  { code: "HB", name: "湖北", short: "鄂", x: 7, y: 4 },
+  { code: "AH", name: "安徽", short: "皖", x: 8, y: 4 },
+  { code: "JS", name: "江苏", short: "苏", x: 9, y: 4 },
+  { code: "SH", name: "上海", short: "沪", x: 10, y: 4 },
+  { code: "ZJ", name: "浙江", short: "浙", x: 10, y: 5 },
+  { code: "FJ", name: "福建", short: "闽", x: 10, y: 6 },
+  { code: "JX", name: "江西", short: "赣", x: 9, y: 5 },
+  { code: "HN", name: "湖南", short: "湘", x: 8, y: 5 },
+  { code: "GD", name: "广东", short: "粤", x: 9, y: 7 },
+  { code: "GX", name: "广西", short: "桂", x: 8, y: 7 },
+  { code: "HI", name: "海南", short: "琼", x: 9, y: 8 },
+  { code: "SC", name: "四川", short: "川", x: 5, y: 5 },
+  { code: "CQ", name: "重庆", short: "渝", x: 6, y: 5 },
+  { code: "GZ", name: "贵州", short: "贵", x: 7, y: 6 },
+  { code: "YN", name: "云南", short: "云", x: 6, y: 7 },
+  { code: "HK", name: "香港", short: "港", x: 10, y: 7 },
+  { code: "MO", name: "澳门", short: "澳", x: 9.6, y: 7.4 },
+  { code: "TW", name: "台湾", short: "台", x: 11, y: 6 },
+];
+
+// Maintain this list to control which provinces are lit.
+export const visitedProvinces = ["BJ", "TJ", "HE", "SD", "JS", "SH", "ZJ", "FJ", "HB", "HN", "GD", "SC", "YN"];
+
