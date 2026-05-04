@@ -23,7 +23,7 @@ const storySeed = [
     localFile: "story-05.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80",
-    text: "4.28，泰州，忙碌一天后两人在休息时拍下了这张慵懒随意的照片",
+    text: "4.28，泰州，忙碌一天后两人在休息时拍下了这张照片",
   },
   {
     title: "南京咖啡馆的合照",
