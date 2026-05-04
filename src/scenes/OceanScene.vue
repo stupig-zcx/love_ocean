@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref } from "vue";
 import FishNode from "../components/FishNode.vue";
 import { useFishSchool } from "../composables/useFishSchool";
@@ -31,14 +31,14 @@ const openStory = (story) => {
 </script>
 
 <template>
-  <main class="story-world ocean-world" aria-label="Ocean memory scene">
+  <main class="story-world ocean-world" aria-label="海洋记忆场景">
     <header class="hero">
-      <p class="hero-subtitle">OUR OCEAN LOVE STORY</p>
-      <h2>Memories floating in the blue ocean</h2>
-      <h4>Catch a fish to open a memory card</h4>
+      <p class="hero-subtitle">我们的海洋恋爱故事</p>
+      <h2>漂浮在蓝色海洋里的回忆</h2>
+      <h4>点击一条小鱼，打开一张专属记忆卡片</h4>
     </header>
 
-    <section ref="oceanStageRef" class="ocean-stage" aria-label="Swimming story fish">
+    <section ref="oceanStageRef" class="ocean-stage" aria-label="游动的故事小鱼">
       <FishNode
         v-for="fish in fishNodes"
         :key="`fish-${fish.index}`"
@@ -49,4 +49,3 @@ const openStory = (story) => {
     </section>
   </main>
 </template>
-

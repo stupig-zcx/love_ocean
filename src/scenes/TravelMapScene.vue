@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, ref, watch } from "vue";
 import { adcodeToProvinceCode, provinceNamesByCode, provinceTravelNotes, visitedProvinces } from "../data/chinaTravel";
 
@@ -142,7 +142,7 @@ const loadMapData = async () => {
 
   try {
     const response = await fetch(CHINA_GEO_URL);
-    if (!response.ok) throw new Error(`Unable to load China map: ${response.status}`);
+    if (!response.ok) throw new Error(`无法加载中国地图: ${response.status}`);
 
     provinceShapes.value = createProvinceShapes(await response.json());
     loadState.value = "ready";
@@ -201,13 +201,13 @@ watch(
 <template>
   <div class="travel-content">
     <header class="hero travel-header">
-      <p class="hero-subtitle">OUR TRAVEL MAP</p>
-      <h2>China travel map with highlighted provinces</h2>
-      <h4>Maintain visited provinces in one data file</h4>
-      <p class="travel-stats">Visited {{ visitedCount }} / {{ provinceShapes.length }} province-level regions</p>
+      <p class="hero-subtitle">我们的旅行地图</p>
+      <h2>点亮一起去过的中国省份</h2>
+      <h4>去过哪里，只需要维护一份旅行数据</h4>
+      <p class="travel-stats">已点亮 {{ visitedCount }} / {{ provinceShapes.length }} 个省级地区</p>
     </header>
 
-    <section class="travel-map-stage" aria-label="China travel map">
+    <section class="travel-map-stage" aria-label="中国旅行地图">
       <div class="travel-map-layout">
         <div class="travel-map-main">
           <svg
@@ -215,7 +215,7 @@ watch(
             :viewBox="`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`"
             preserveAspectRatio="xMidYMid meet"
             role="img"
-            aria-label="China provinces map"
+            aria-label="中国省份地图"
           >
             <text
               v-if="loadState !== 'ready'"
@@ -225,7 +225,7 @@ watch(
               dominant-baseline="middle"
               text-anchor="middle"
             >
-              {{ loadState === "error" ? "Map failed to load" : "Loading China map..." }}
+              {{ loadState === "error" ? "地图加载失败" : "正在加载中国地图..." }}
             </text>
 
             <g
@@ -247,9 +247,9 @@ watch(
 
           <div class="travel-legend">
             <span class="legend-chip visited"></span>
-            <span>Visited</span>
+            <span>已去过</span>
             <span class="legend-chip"></span>
-            <span>Not visited</span>
+            <span>未去过</span>
           </div>
         </div>
 
@@ -260,7 +260,7 @@ watch(
               :viewBox="`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`"
               preserveAspectRatio="xMidYMid meet"
               role="img"
-              :aria-label="activeProvince ? `${activeProvince.name} map preview` : 'Province preview placeholder'"
+              :aria-label="activeProvince ? `${activeProvince.name}地图预览` : '省份预览占位'"
             >
               <path
                 v-if="activeProvince"
@@ -276,7 +276,7 @@ watch(
                 dominant-baseline="middle"
                 text-anchor="middle"
               >
-                Select a province
+                请选择省份
               </text>
             </svg>
           </div>
@@ -293,6 +293,8 @@ watch(
       </div>
     </section>
 
-    <footer class="story-footer">To be continue...</footer>
+    <footer class="story-footer">未完待续...</footer>
   </div>
 </template>
+
+

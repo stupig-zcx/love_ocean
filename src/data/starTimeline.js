@@ -1,59 +1,58 @@
-// Scene 2 timeline dataset.
+﻿// Scene 2 timeline dataset.
 export const starTimeline = [
   {
     id: "star-2024-02-14",
     date: "2024-02-14",
-    title: "Heartbeat Start",
-    text: "Our first long-night chat turned a simple evening into the start of us.",
+    title: "心动开始",
+    text: "第一次聊到很晚，普通的夜晚从那一刻变成了我们的开场。",
   },
   {
     id: "star-2024-03-03",
     date: "2024-03-03",
-    title: "Perfect Sync",
-    text: "We kept finishing each other's sentences and laughing at the same moment.",
+    title: "默契同步",
+    text: "我们总是接住对方的话，也总是在同一个瞬间笑出来。",
   },
   {
     id: "star-2024-05-20",
     date: "2024-05-20",
-    title: "Tiny Surprise",
-    text: "A small gift and a bright smile became one of our favorite memories.",
+    title: "小小惊喜",
+    text: "一份小礼物和一个明亮的笑，变成了后来反复想起的记忆。",
   },
   {
     id: "star-2024-07-11",
     date: "2024-07-11",
-    title: "Rain Window",
-    text: "Rain outside, silence inside, and the most peaceful shoulder to lean on.",
+    title: "雨窗旁边",
+    text: "窗外下着雨，屋里很安静，肩膀刚好可以依靠。",
   },
   {
     id: "star-2024-09-21",
     date: "2024-09-21",
-    title: "Birthday Wish",
-    text: "Every wish on that night quietly pointed to one future: us together.",
+    title: "生日愿望",
+    text: "那晚许下的每个愿望，最后都悄悄指向了同一个未来。",
   },
   {
     id: "star-2024-12-31",
     date: "2024-12-31",
-    title: "Countdown",
-    text: "At zero, we did not shout; we just looked at each other and smiled.",
+    title: "跨年倒数",
+    text: "倒数归零的时候，我们没有大声喊，只是看着彼此笑了。",
   },
   {
     id: "star-2025-02-14",
     date: "2025-02-14",
-    title: "One Year",
-    text: "The best part of the year was every ordinary day spent side by side.",
+    title: "一周年",
+    text: "这一年最好的部分，是每一个可以并肩度过的普通日子。",
   },
   {
     id: "star-2025-04-12",
     date: "2025-04-12",
-    title: "Future List",
-    text: "A long list of dreams, with one rule: complete every item together.",
+    title: "未来清单",
+    text: "我们写下很多想做的事，唯一的规则是每一件都要一起完成。",
   },
   {
     id: "star-ending",
     date: "",
-    title: "To be continue...",
-    text: "To be continue...",
+    title: "未完待续...",
+    text: "未完待续...",
     isEnding: true,
   },
 ];
-

@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { starTimeline } from "../data/starTimeline";
 
@@ -18,6 +18,16 @@ const loveProfile = {
   yiBirthday: "03.23",
   togetherSince: "2026-04-06",
 };
+
+const meteors = Array.from({ length: 14 }, (_, index) => ({
+  id: `meteor-${index}`,
+  top: 6 + ((index * 17) % 62),
+  left: -18 + ((index * 19) % 74),
+  delay: -((index * 1.37) % 9.8),
+  duration: 4.8 + ((index * 0.71) % 4.4),
+  length: 150 + ((index * 23) % 150),
+  opacity: 0.42 + ((index * 0.09) % 0.36),
+}));
 
 const togetherDays = computed(() => {
   const start = new Date(`${loveProfile.togetherSince}T00:00:00`);
@@ -57,8 +67,8 @@ const starNodes = computed(() => {
         {
           id: "star-ending",
           date: "",
-          title: "To be continue...",
-          text: "To be continue...",
+          title: "鏈畬寰呯画...",
+          text: "鏈畬寰呯画...",
           isEnding: true,
         },
       ];
@@ -246,20 +256,36 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
+    <div class="meteor-layer" aria-hidden="true">
+      <span
+        v-for="meteor in meteors"
+        :key="meteor.id"
+        class="meteor"
+        :style="{
+          '--meteor-top': `${meteor.top}%`,
+          '--meteor-left': `${meteor.left}%`,
+          '--meteor-delay': `${meteor.delay}s`,
+          '--meteor-duration': `${meteor.duration}s`,
+          '--meteor-length': `${meteor.length}px`,
+          '--meteor-opacity': meteor.opacity,
+        }"
+      ></span>
+    </div>
+
     <header class="sky-header">
-      <p class="hero-subtitle sky-subtitle">OUR STAR MAP</p>
-      <h2>A timeline made of stars</h2>
-      <h4>Drag horizontally to browse moments</h4>
+      <p class="hero-subtitle sky-subtitle">我们的星空时间轴</p>
+      <h2>由星星串起的时间节点</h2>
+      <h4>按住左右拖动，浏览属于我们的瞬间</h4>
       <p class="love-meta">
-        Chen {{ loveProfile.chenBirthday }} | Yi {{ loveProfile.yiBirthday }} | Together since
-        {{ loveProfile.togetherSince }} | Lasts for {{ togetherDays }} days
+        小晨生日 {{ loveProfile.chenBirthday }} | 小逸生日 {{ loveProfile.yiBirthday }} | 在一起
+        {{ loveProfile.togetherSince }} | 已经 {{ togetherDays }} 天
       </p>
     </header>
 
     <div
       ref="starScrollRef"
       class="star-scroll"
-      aria-label="Horizontal star timeline"
+      aria-label="横向星空时间轴"
       @pointerdown="onPointerDown"
       @pointermove="onPointerMove"
       @pointerup="onPointerUp"
@@ -295,4 +321,5 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+
 

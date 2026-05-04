@@ -207,14 +207,14 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="fragments-content">
-    <section class="film-strip-layout" aria-label="Film reel room">
+    <section class="film-strip-layout" aria-label="电影胶卷房">
       <div class="film-strip-scroll" @mouseleave="clearPastHover">
         <div class="film-world">
           <div class="film-orbit film-orbit--left"></div>
           <div class="film-orbit film-orbit--right"></div>
 
-          <section class="film-zone film-zone--past" aria-label="Captured daily memories">
-            <p class="film-kicker">PAST FRAMES</p>
+          <section class="film-zone film-zone--past" aria-label="已拍摄的日常回忆">
+            <p class="film-kicker">已拍摄胶卷</p>
             <h2>日常点滴</h2>
             <p class="film-zone-desc">每一个平凡瞬间，都是生活的热爱。</p>
 
@@ -260,8 +260,8 @@ onBeforeUnmount(() => {
             </div>
           </section>
 
-          <section class="film-zone film-zone--future" aria-label="Future wishes">
-            <p class="film-kicker">UNSHOT REELS</p>
+          <section class="film-zone film-zone--future" aria-label="未来祈愿">
+            <p class="film-kicker">未拍摄胶卷</p>
             <h2>未来祈愿</h2>
             <p class="film-zone-desc">向着光的方向，遇见更好的我们。</p>
 
@@ -276,7 +276,7 @@ onBeforeUnmount(() => {
               >
                 <div class="film-reel-track">
                   <article v-for="reel in futureReels" :key="reel.id" class="reel-card reel-card--future">
-                    <div class="reel-sealed-badge">UNEXPOSED</div>
+                    <div class="reel-sealed-badge">未启封</div>
                     <div class="reel-copy reel-copy--future">
                       <p class="reel-date">{{ reel.date }}</p>
                       <h3>{{ reel.title }}</h3>

@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
 
     <!-- Manual music switch -->
     <button class="music-toggle" type="button" :disabled="!hasMusic" @click="toggleMusic">
-      {{ !hasMusic ? "Music: N/A" : musicEnabled ? "Music: On" : "Music: Off" }}
+      {{ !hasMusic ? "音乐：暂无" : musicEnabled ? "音乐：开" : "音乐：关" }}
     </button>
 
     <!-- Scenes container -->

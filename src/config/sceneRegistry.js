@@ -12,7 +12,7 @@ export const sceneRegistry = [
     sparkleMode: "ocean",
     musicKey: "ocean",
     panelClass: "ocean-panel",
-    ariaLabel: "Ocean Story Scene",
+    ariaLabel: "海洋故事场景",
   },
   {
     id: "star",
@@ -21,7 +21,7 @@ export const sceneRegistry = [
     sparkleMode: "star",
     musicKey: "sky",
     panelClass: "sky-panel",
-    ariaLabel: "Star Timeline Scene",
+    ariaLabel: "星空时间轴场景",
   },
   {
     id: "fragments",
@@ -30,7 +30,7 @@ export const sceneRegistry = [
     sparkleMode: "film",
     musicKey: "fragments",
     panelClass: "fragments-panel",
-    ariaLabel: "Daily Fragments Scene",
+    ariaLabel: "日常胶卷场景",
   },
   {
     id: "travel",
@@ -39,7 +39,7 @@ export const sceneRegistry = [
     sparkleMode: "travel",
     musicKey: "travel",
     panelClass: "travel-panel",
-    ariaLabel: "China Travel Map Scene",
+    ariaLabel: "中国旅行地图场景",
   },
 ];
 
