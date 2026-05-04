@@ -19,53 +19,88 @@ const localImageList = Object.keys(localImagesByName).map((name) => localImagesB
 // Raw stories for fish nodes.
 const storySeed = [
   {
-    title: "相识",
+    title: "忙碌过后",
     localFile: "story-05.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80",
-    text: "那天屏幕的光很淡，你的头像轻轻闪烁，像故事的第一页。我们还不知道未来会发生什么，但命运已经悄悄开始书写。",
+    text: "4.28，泰州，忙碌一天后两人在休息时拍下了这张慵懒随意的照片",
   },
   {
-    title: "完美的合照",
+    title: "南京咖啡馆的合照",
     localFile: "story-01.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
-    text: "我们一起拍了很多照片，每一张都记录了我们的笑容和眼神。那些合照里藏着我们最真实的幸福。",
+    text: "4.13号下午，南京咖啡馆，这是我们第一次正式的合照，记录了我们相识不久的美好时光。",
   },
   {
-    title: "小晨的第一次摄影",
+    title: "小逸毕业啦！",
     localFile: "story-04.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    text: "出片出片--漂亮女朋友的追求之一。怀着无尽的忐忑，小晨开启了他的摄影生涯，咔擦咔擦！可谁能想到，小晨第一次摄影就取得大成功！",
+    text: "4.28，泰州，小逸答辩结束的第二天，小晨赶到泰州一起拍下了这张穿着毕业服的照片！",
   },
   {
-    title: "漫步公园",
+    title: "拼豆后",
     localFile: "story-03.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1200&q=80",
-    text: "我们喜欢在周末一起去公园散步，感受自然的美好。每次走在绿树成荫的小径上，我们都觉得时间变得慢了下来，心也变得更近了。而这是我们第一次在公园漫步时拍下的照片。",
+    text: "4.24号下午，拼豆拼了一个下午，拼完回家途中拍下了这张照片，宝宝真好看！",
   },
   {
-    title: "平凡的一天",
+    title: "地铁搞怪",
     localFile: "story-07.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-    text: "没有特别安排的一天，我们一起做饭、聊天。在我眼中最温柔的幸福，不过就是和你共享普通日常。这是我们第一次共同做饭的记录！小晨做的糖醋排骨，小逸做的葱烧鸡！",
+    text: "4.21晚，两人在地铁上，宝宝搞怪图片，好可爱！",
   },
   {
     title: "小逸第一张满意的合照",
     localFile: "story-06.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
-    text: "我喜欢充满生活感的照片，小逸喜欢好看的照片，而这张又充满生活感又好看！",
+    text: "4.12晚。我喜欢充满生活感的照片，小逸喜欢好看的照片，而这张又充满生活感又好看！",
   },
   {
     title: "上海健身房",
     localFile: "story-02.jpg",
     fallbackImage:
       "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
-    text: "小逸陪小晨前往上海线下面试，这一天好幸福，晚上九点两人在健身房拍了这张照片，淡淡的幸福感。",
+    text: "4.16日晚，小逸陪小晨前往上海线下面试，这一天好幸福，晚上九点两人在健身房拍了这张照片，淡淡的幸福感。",
+  },
+    {
+    title: "小逸穿小晨衣服",
+    localFile: "story-08.jpg",
+    fallbackImage:
+      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
+    text: "4.23日晚，小逸穿小晨衣服，随后小晨偷拍合照被嫌弃...",
+  },
+      {
+    title: "偷拍被嫌弃",
+    localFile: "story-09.jpg",
+    fallbackImage:
+      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
+    text: "4.13，小晨偷拍小逸，小逸觉得不好看不让我把这张照片放出来，我觉得很可爱，还是冒死放了出来",
+  },
+  {
+    title: "三连拍",
+    localFile: "story-10.jpg",
+    fallbackImage:
+      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
+    text: "4.13，咖啡馆三连拍！",
+  },
+    {
+    title: "高铁包厢",
+    localFile: "story-11.jpg",
+    fallbackImage:
+      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
+    text: "4.17日21:56，途径镇江时高铁车厢已无人，包厢合照！",
+  },
+  {
+    title: "第一张拍立得",
+    localFile: "story-12.jpg",
+    fallbackImage:
+      "https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=1200&q=80",
+    text: "4.28，小晨和小逸拍下了第一张拍立得，小逸抿嘴了，但颇有纪念意义",
   },
 ];
 

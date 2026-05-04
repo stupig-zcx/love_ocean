@@ -1,6 +1,7 @@
 ﻿<script setup>
 import { ref } from "vue";
 import FishNode from "../components/FishNode.vue";
+import OceanSeabed from "../components/OceanSeabed.vue";
 import { useFishSchool } from "../composables/useFishSchool";
 import { stories } from "../data/stories";
 
@@ -38,6 +39,8 @@ const openStory = (story) => {
     </header>
 
     <section ref="oceanStageRef" class="ocean-stage" aria-label="游动的故事小鱼">
+      <OceanSeabed />
+
       <FishNode
         v-for="fish in fishNodes"
         :key="`fish-${fish.index}`"
