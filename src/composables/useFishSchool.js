@@ -4,6 +4,7 @@
 const random = (min, max) => min + Math.random() * (max - min);
 const TAU = Math.PI * 2;
 const FISH_TYPES = ["goldie", "peach", "mint", "dream", "sword", "shark", "clown", "puffer", "starfish", "jellyfish"];
+const GUARANTEED_FISH_TYPES = ["jellyfish"];
 const FISH_TYPE_CONFIG = {
   goldie: { sizeMul: 1, speedMul: 1 },
   peach: { sizeMul: 0.96, speedMul: 1.02 },
@@ -44,8 +45,8 @@ export function useFishSchool(storiesRef, stageRef) {
     return { width, height };
   };
 
-  const makeFish = (story, index, width, height) => {
-    const type = FISH_TYPES[Math.floor(random(0, FISH_TYPES.length))];
+  const makeFish = (story, index, width, height, forcedType = "") => {
+    const type = forcedType || FISH_TYPES[Math.floor(random(0, FISH_TYPES.length))];
     const typeConfig = FISH_TYPE_CONFIG[type];
     const baseSize = 68 + ((index * 13) % 22);
     const size = baseSize * typeConfig.sizeMul;
@@ -68,13 +69,33 @@ export function useFishSchool(storiesRef, stageRef) {
     };
   };
 
+  const createGuaranteedTypeMap = (count) => {
+    const availableIndexes = Array.from({ length: count }, (_, index) => index);
+    const guaranteedByIndex = new Map();
+
+    for (const type of GUARANTEED_FISH_TYPES) {
+      if (!availableIndexes.length) {
+        break;
+      }
+
+      const pick = Math.floor(random(0, availableIndexes.length));
+      const [index] = availableIndexes.splice(pick, 1);
+      guaranteedByIndex.set(index, type);
+    }
+
+    return guaranteedByIndex;
+  };
+
   const initFish = () => {
     const { width, height } = stageSize();
     if (!width || !height) {
       return;
     }
 
-    fishNodes.value = storiesRef.value.map((story, index) => makeFish(story, index, width, height));
+    const guaranteedByIndex = createGuaranteedTypeMap(storiesRef.value.length);
+    fishNodes.value = storiesRef.value.map((story, index) =>
+      makeFish(story, index, width, height, guaranteedByIndex.get(index))
+    );
   };
 
   const keepFishInBounds = () => {

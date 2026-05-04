@@ -273,9 +273,8 @@ onBeforeUnmount(() => {
     </div>
 
     <header class="sky-header">
-      <p class="hero-subtitle sky-subtitle">我们的星空时间轴</p>
-      <h2>由星星串起的时间节点</h2>
-      <h4>按住左右拖动，浏览属于我们的瞬间</h4>
+      <h2>星空时间轴</h2>
+      <h4>按住左右拖动，点击卡片翻转</h4>
       <p class="love-meta">
         小晨生日 {{ loveProfile.chenBirthday }} | 小逸生日 {{ loveProfile.yiBirthday }} | 在一起
         {{ loveProfile.togetherSince }} | 已经 {{ togetherDays }} 天
