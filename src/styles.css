@@ -48,9 +48,9 @@ body {
 
 .ocean-panel {
   background:
-    radial-gradient(circle at 12% 16%, rgba(114, 197, 255, 0.35), transparent 26%),
-    radial-gradient(circle at 84% 12%, rgba(84, 145, 255, 0.28), transparent 28%),
-    linear-gradient(180deg, #06224e 0%, #07356e 30%, #0b4f8f 62%, #0e639a 100%);
+    radial-gradient(circle at 16% 6%, rgba(190, 246, 255, 0.45), transparent 22%),
+    radial-gradient(circle at 78% 10%, rgba(107, 203, 255, 0.28), transparent 28%),
+    linear-gradient(180deg, #7edcff 0%, #1885bb 18%, #075c91 44%, #073867 72%, #031d3e 100%);
 }
 
 /* Global particle canvas (mouse trail + ambience) */
@@ -114,6 +114,7 @@ body {
   padding: min(11vh, 88px) 16px 20px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .ocean-world::before {
@@ -122,15 +123,36 @@ body {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(153, 216, 255, 0.16) 0%, rgba(33, 117, 183, 0.06) 32%, transparent 56%),
-    radial-gradient(circle at 50% 120%, rgba(2, 26, 49, 0.5), transparent 55%);
+    linear-gradient(104deg, transparent 0 9%, rgba(219, 253, 255, 0.22) 10%, transparent 22%),
+    linear-gradient(116deg, transparent 0 24%, rgba(171, 232, 255, 0.17) 25%, transparent 38%),
+    linear-gradient(72deg, transparent 0 55%, rgba(205, 249, 255, 0.13) 56%, transparent 68%),
+    radial-gradient(ellipse at 50% 112%, rgba(8, 35, 52, 0.76) 0%, rgba(7, 45, 69, 0.38) 32%, transparent 58%),
+    radial-gradient(circle at 18% 76%, rgba(0, 15, 32, 0.26), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(33, 117, 183, 0.04) 30%, rgba(1, 14, 34, 0.48) 100%);
+  mix-blend-mode: screen;
+}
+
+.ocean-world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 42% 38%, rgba(218, 252, 255, 0.42) 0 1px, transparent 2px),
+    radial-gradient(circle at 74% 28%, rgba(255, 255, 255, 0.5) 0 1px, transparent 2px),
+    radial-gradient(circle at 63% 66%, rgba(205, 241, 255, 0.32) 0 1px, transparent 2px),
+    repeating-radial-gradient(ellipse at 50% -8%, rgba(255, 255, 255, 0.18) 0 1px, transparent 2px 18px);
+  background-size: 220px 180px, 260px 230px, 300px 210px, 240px 260px, 100% 220px;
+  animation: oceanParticlesDrift 16s ease-in-out infinite alternate;
 }
 
 .hero,
 .sky-header {
   text-align: center;
   position: relative;
-  z-index: 1;
+  z-index: 4;
 }
 
 .hero-subtitle {
@@ -166,17 +188,20 @@ body {
 
 /* Scene 1 fish tank area */
 .ocean-stage {
-  position: relative;
-  max-width: 1060px;
+  position: absolute;
+  inset: 0;
+  max-width: none;
   width: 100%;
-  margin: 20px auto 0;
-  flex: 1;
-  min-height: 420px;
+  height: 100%;
+  margin: 0;
+  min-height: 0;
   overflow: hidden;
-  border-radius: 26px;
-  border: 2px solid rgba(209, 242, 255, 0.58);
-  background: transparent;
-  box-shadow: 0 12px 26px rgba(5, 31, 63, 0.2);
+  border-radius: 0;
+  border: 0;
+  background:
+    linear-gradient(180deg, rgba(146, 222, 255, 0.04), rgba(9, 63, 101, 0.1) 54%, rgba(0, 19, 43, 0.18)),
+    radial-gradient(ellipse at 50% 118%, rgba(192, 158, 94, 0.22), transparent 34%);
+  box-shadow: none;
 }
 
 .ocean-stage::before {
@@ -185,7 +210,14 @@ body {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(235, 250, 255, 0.22);
+  background:
+    linear-gradient(105deg, transparent 0 13%, rgba(255, 255, 255, 0.16) 14%, transparent 28%),
+    linear-gradient(74deg, transparent 0 52%, rgba(201, 244, 255, 0.12) 53%, transparent 64%),
+    repeating-linear-gradient(12deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(98deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 34px);
+  background-size: 100% 100%, 100% 100%, 180px 180px, 220px 220px;
+  box-shadow: inset 0 -80px 120px rgba(0, 12, 30, 0.22);
+  animation: oceanCaustics 13s ease-in-out infinite alternate;
 }
 
 .fish-node {
@@ -1911,6 +1943,28 @@ body {
   }
 }
 
+@keyframes oceanParticlesDrift {
+  from {
+    transform: translate3d(-14px, -8px, 0);
+  }
+
+  to {
+    transform: translate3d(18px, 14px, 0);
+  }
+}
+
+@keyframes oceanCaustics {
+  from {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    opacity: 0.78;
+  }
+
+  to {
+    background-position: 0 0, 0 0, 42px 22px, -36px 18px;
+    opacity: 0.96;
+  }
+}
+
 @keyframes starNodeIn {
   from {
     opacity: 0;
@@ -1944,9 +1998,9 @@ body {
   }
 
   .ocean-stage {
-    min-height: 340px;
-    max-width: 94vw;
-    border-radius: 18px;
+    min-height: 0;
+    max-width: none;
+    border-radius: 0;
   }
 
   .sky-panel {

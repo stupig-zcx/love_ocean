@@ -33,9 +33,8 @@ const openStory = (story) => {
 <template>
   <main class="story-world ocean-world" aria-label="海洋记忆场景">
     <header class="hero">
-      <p class="hero-subtitle">我们的海洋恋爱故事</p>
-      <h2>漂浮在蓝色海洋里的回忆</h2>
-      <h4>点击一条小鱼，打开一张专属记忆卡片</h4>
+      <h2>漂浮在蓝色海洋里的回忆合照</h2>
+      <h4>点击小鱼，每一张小鱼都承载了一张专属合照</h4>
     </header>
 
     <section ref="oceanStageRef" class="ocean-stage" aria-label="游动的故事小鱼">
