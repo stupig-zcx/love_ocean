@@ -840,9 +840,38 @@ body {
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(circle at 12% 16%, rgba(185, 242, 210, 0.2), transparent 26%),
-    radial-gradient(circle at 86% 22%, rgba(168, 224, 255, 0.18), transparent 30%),
-    linear-gradient(180deg, #102622 0%, #16362f 52%, #1b453a 100%);
+    radial-gradient(circle at 82% 8%, rgba(210, 255, 203, 0.24), transparent 30%),
+    radial-gradient(circle at 12% 18%, rgba(98, 207, 146, 0.22), transparent 28%),
+    linear-gradient(135deg, rgba(17, 63, 43, 0.9), rgba(7, 34, 27, 0.92) 46%, rgba(25, 79, 53, 0.94) 100%);
+  overflow: hidden;
+}
+
+.travel-panel::before,
+.travel-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.travel-panel::before {
+  background:
+    repeating-linear-gradient(0deg, rgba(205, 255, 211, 0.045) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(90deg, rgba(205, 255, 211, 0.035) 0 1px, transparent 1px 34px),
+    radial-gradient(circle at 36% 34%, rgba(218, 255, 190, 0.72) 0 2px, transparent 3px),
+    radial-gradient(circle at 58% 20%, rgba(218, 255, 190, 0.52) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 63%, rgba(218, 255, 190, 0.48) 0 1px, transparent 2px);
+  background-size: auto, auto, 260px 220px, 310px 250px, 290px 240px;
+  opacity: 0.66;
+  mix-blend-mode: screen;
+}
+
+.travel-panel::after {
+  background:
+    radial-gradient(ellipse at 18% 100%, rgba(180, 240, 178, 0.24), transparent 30%),
+    radial-gradient(ellipse at 91% 96%, rgba(200, 255, 196, 0.2), transparent 24%),
+    repeating-radial-gradient(ellipse at 28% 25%, transparent 0 18px, rgba(189, 255, 189, 0.045) 19px 20px);
+  opacity: 0.8;
 }
 
 .sky-panel::before {
@@ -1644,8 +1673,13 @@ body {
   margin: 18px auto 0;
   padding: 8px 10px 8px;
   border-radius: 16px;
-  background: rgba(6, 19, 15, 0.34);
-  border: 1px solid rgba(182, 236, 211, 0.22);
+  background:
+    linear-gradient(145deg, rgba(244, 255, 235, 0.08), rgba(6, 31, 20, 0.28)),
+    rgba(6, 19, 15, 0.24);
+  border: 1px solid rgba(204, 244, 217, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 28px 80px rgba(0, 0, 0, 0.18);
 }
 
 .travel-map-layout {
@@ -1671,7 +1705,10 @@ body {
   width: 100%;
   height: min(62vh, 620px);
   display: block;
-  filter: drop-shadow(0 20px 36px rgba(0, 0, 0, 0.26));
+  filter:
+    drop-shadow(0 28px 0 rgba(3, 18, 13, 0.22))
+    drop-shadow(0 30px 38px rgba(0, 0, 0, 0.32))
+    drop-shadow(0 -1px 0 rgba(239, 255, 240, 0.42));
 }
 
 .province-region {
@@ -1680,45 +1717,66 @@ body {
 }
 
 .province-path {
-  fill: rgba(79, 104, 94, 0.42);
-  stroke: rgba(205, 235, 222, 0.48);
+  fill: rgba(91, 126, 103, 0.64);
+  stroke: rgba(222, 248, 228, 0.62);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
   transition: fill 0.24s ease, stroke 0.24s ease, filter 0.24s ease;
+  filter:
+    drop-shadow(0 5px 0 rgba(17, 55, 35, 0.42))
+    drop-shadow(0 12px 15px rgba(0, 0, 0, 0.18));
 }
 
 .province-region:hover .province-path {
-  fill: rgba(164, 210, 188, 0.58);
+  fill: rgba(169, 219, 184, 0.76);
   stroke: rgba(241, 255, 249, 0.88);
-  filter: drop-shadow(0 0 8px rgba(200, 255, 224, 0.24));
+  filter:
+    drop-shadow(0 6px 0 rgba(32, 85, 51, 0.48))
+    drop-shadow(0 16px 18px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 0 12px rgba(200, 255, 224, 0.34));
 }
 
 .province-region:focus-visible .province-path {
   stroke: rgba(241, 255, 249, 0.88);
-  filter: drop-shadow(0 0 8px rgba(200, 255, 224, 0.24));
+  filter:
+    drop-shadow(0 6px 0 rgba(32, 85, 51, 0.48))
+    drop-shadow(0 16px 18px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 0 12px rgba(200, 255, 224, 0.34));
 }
 
 .province-region.visited .province-path {
-  fill: rgba(127, 235, 181, 0.88);
+  fill: rgba(137, 238, 166, 0.9);
   stroke: rgba(231, 255, 245, 0.95);
-  filter: drop-shadow(0 0 8px rgba(127, 235, 181, 0.3));
+  filter:
+    drop-shadow(0 6px 0 rgba(41, 109, 56, 0.5))
+    drop-shadow(0 16px 18px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 0 12px rgba(127, 235, 181, 0.44));
 }
 
 .province-region.visited:hover .province-path {
   fill: rgba(174, 252, 210, 0.96);
   stroke: #ffffff;
-  filter: drop-shadow(0 0 12px rgba(174, 252, 210, 0.5));
+  filter:
+    drop-shadow(0 7px 0 rgba(50, 126, 69, 0.56))
+    drop-shadow(0 18px 22px rgba(0, 0, 0, 0.24))
+    drop-shadow(0 0 18px rgba(174, 252, 210, 0.62));
 }
 
 .province-region.visited:focus-visible .province-path {
   stroke: #ffffff;
-  filter: drop-shadow(0 0 12px rgba(174, 252, 210, 0.5));
+  filter:
+    drop-shadow(0 7px 0 rgba(50, 126, 69, 0.56))
+    drop-shadow(0 18px 22px rgba(0, 0, 0, 0.24))
+    drop-shadow(0 0 18px rgba(174, 252, 210, 0.62));
 }
 
 .province-region.selected .province-path {
   stroke: #ffffff;
   stroke-width: 1.8;
-  filter: drop-shadow(0 0 14px rgba(174, 252, 210, 0.52));
+  filter:
+    drop-shadow(0 8px 0 rgba(55, 132, 74, 0.58))
+    drop-shadow(0 20px 24px rgba(0, 0, 0, 0.26))
+    drop-shadow(0 0 20px rgba(174, 252, 210, 0.62));
 }
 
 .map-loading-label {
@@ -1754,11 +1812,16 @@ body {
 }
 
 .province-preview-frame {
-  border: 1px solid rgba(210, 245, 226, 0.24);
+  border: 1px solid rgba(220, 255, 228, 0.32);
   background:
-    linear-gradient(135deg, rgba(243, 255, 247, 0.1), rgba(18, 54, 38, 0.1)),
-    rgba(5, 20, 15, 0.42);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+    radial-gradient(circle at 72% 22%, rgba(205, 255, 196, 0.2), transparent 34%),
+    repeating-radial-gradient(circle at 52% 50%, transparent 0 24px, rgba(214, 255, 216, 0.055) 25px 26px),
+    linear-gradient(135deg, rgba(243, 255, 247, 0.13), rgba(18, 54, 38, 0.12)),
+    rgba(5, 28, 18, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 18px 44px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(12px);
 }
 
 .province-preview-frame {
@@ -1775,11 +1838,14 @@ body {
   width: 100%;
   height: 100%;
   display: block;
-  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.24));
+  filter:
+    drop-shadow(0 8px 0 rgba(33, 91, 48, 0.34))
+    drop-shadow(0 18px 22px rgba(0, 0, 0, 0.3))
+    drop-shadow(0 0 12px rgba(198, 255, 204, 0.2));
 }
 
 .province-preview-path {
-  fill: rgba(150, 196, 174, 0.62);
+  fill: rgba(176, 223, 174, 0.82);
   stroke: rgba(241, 255, 249, 0.88);
   stroke-width: 1.4;
   vector-effect: non-scaling-stroke;
@@ -1796,11 +1862,21 @@ body {
   justify-self: center;
   width: min(100%, 320px);
   height: 230px;
-  padding: 0 clamp(4px, 1.2vw, 12px);
+  padding: 18px clamp(16px, 1.5vw, 22px);
   color: rgba(235, 248, 240, 0.94);
   display: flex;
   flex-direction: column;
   min-height: 0;
+  border: 1px solid rgba(220, 255, 228, 0.24);
+  border-radius: 24px;
+  background:
+    linear-gradient(150deg, rgba(231, 255, 229, 0.14), rgba(8, 39, 25, 0.08)),
+    rgba(5, 27, 18, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(11, 48, 28, 0.38),
+    0 22px 54px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(12px);
 }
 
 .travel-note-panel.empty {
@@ -1810,35 +1886,37 @@ body {
 .travel-note-date {
   margin: 0 0 8px;
   font-family: "Nunito", "Microsoft YaHei", sans-serif;
-  font-size: 0.86rem;
+  font-size: 0.76rem;
   letter-spacing: 0.08em;
-  color: rgba(219, 248, 232, 0.72);
+  color: rgba(206, 244, 217, 0.7);
 }
 
 .travel-province-name {
   margin: 0;
   font-family: "ZCOOL KuaiLe", "Microsoft YaHei", sans-serif;
-  font-size: clamp(2rem, 3.4vw, 3.25rem);
-  line-height: 0.98;
+  font-size: clamp(1.2rem, 1.8vw, 1.72rem);
+  line-height: 1.12;
   color: #f5fff8;
+  letter-spacing: 0.02em;
+  text-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
 }
 
 .travel-note-title {
-  margin: 14px 0 0;
-  font-size: clamp(0.98rem, 1.4vw, 1.16rem);
+  margin: 12px 0 0;
+  font-size: clamp(0.86rem, 1.08vw, 0.98rem);
   line-height: 1.45;
-  color: rgba(218, 244, 229, 0.84);
+  color: rgba(218, 244, 229, 0.8);
 }
 
 .travel-note-list {
-  margin: 16px 0 0;
+  margin: 13px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
   align-content: start;
   gap: 9px;
-  font-size: 0.94rem;
-  line-height: 1.72;
+  font-size: 0.84rem;
+  line-height: 1.66;
   color: rgba(234, 248, 239, 0.86);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -2345,7 +2423,8 @@ body {
   }
 
   .travel-province-name {
-    font-size: 1.85rem;
+    font-size: 1.18rem;
+    line-height: 1.16;
   }
 
   .travel-note-list {
