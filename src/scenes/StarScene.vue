@@ -19,6 +19,10 @@ const loveProfile = {
   togetherSince: "2026-04-06",
 };
 
+const bridgeHint = "按住左右拖动，点击卡片翻转";
+const bridgeHintChars = Array.from(bridgeHint);
+const bridgeCenter = (bridgeHintChars.length - 1) / 2;
+
 const meteors = Array.from({ length: 14 }, (_, index) => ({
   id: `meteor-${index}`,
   top: 6 + ((index * 17) % 62),
@@ -273,8 +277,19 @@ onBeforeUnmount(() => {
     </div>
 
     <header class="sky-header">
-      <h2>星空时间轴</h2>
-      <h4>按住左右拖动，点击卡片翻转</h4>
+      <h2>星空时间轴————记录我们的第一次</h2>
+      <h4 class="bridge-hint" aria-label="按住左右拖动，点击卡片翻转">
+        <span
+          v-for="(char, index) in bridgeHintChars"
+          :key="`${char}-${index}`"
+          aria-hidden="true"
+          :style="{
+            '--bridge-x': index - bridgeCenter,
+            '--bridge-y': Math.pow(index - bridgeCenter, 2),
+            '--bridge-rotate': `${(index - bridgeCenter) * 3.4}deg`,
+          }"
+        >{{ char }}</span>
+      </h4>
       <p class="love-meta">
         小晨生日 {{ loveProfile.chenBirthday }} | 小逸生日 {{ loveProfile.yiBirthday }} | 在一起
         {{ loveProfile.togetherSince }} | 已经 {{ togetherDays }} 天

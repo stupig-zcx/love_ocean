@@ -174,7 +174,7 @@ body {
 
 .hero h2,
 .sky-header h2 {
-  font-size: clamp(1.36rem, 2.35vw, 2.18rem);
+  font-size: clamp(1.1rem, 1.9vw, 1.75rem);
   line-height: 1.14;
 }
 
@@ -920,6 +920,28 @@ body {
 
 .sky-header h2 {
   color: #ffffff;
+}
+
+.sky-header .bridge-hint {
+  min-height: 42px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.08em;
+  margin: 48px auto 0;
+  white-space: nowrap;
+}
+
+.sky-header .bridge-hint span {
+  display: inline-block;
+  transform:
+    translateY(calc((var(--bridge-y) - 30) * 0.42px))
+    rotate(var(--bridge-rotate));
+  transform-origin: center 32px;
+  color: rgba(239, 245, 255, 0.94);
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.28),
+    0 6px 16px rgba(0, 0, 0, 0.32);
 }
 
 .love-meta {
@@ -2159,6 +2181,17 @@ body {
   .note-date {
     font-size: 0.56rem;
     letter-spacing: 0.03em;
+  }
+
+  .sky-header .bridge-hint {
+    min-height: 34px;
+    gap: 0.03em;
+  }
+
+  .sky-header .bridge-hint span {
+    transform:
+      translateY(calc((var(--bridge-y) - 30) * 0.3px))
+      rotate(calc(var(--bridge-rotate) * 0.72));
   }
 
   .ending-note-text {
