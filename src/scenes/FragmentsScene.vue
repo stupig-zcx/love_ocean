@@ -67,6 +67,10 @@ const hoveredPastLines = computed(() => {
   return [reel.title, reel.date, reel.longText];
 });
 
+const hoveredPastCharacters = computed(() =>
+  hoveredPastLines.value.map((line) => Array.from(line))
+);
+
 const createDragState = () => ({
   active: false,
   pointerId: null,
@@ -243,12 +247,15 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="film-hover-letter" :class="{ show: Boolean(hoveredPastCopy) }" aria-live="polite">
-              <span
-                v-for="(line, index) in hoveredPastLines"
-                :key="`${hoveredPastId || 'empty'}-${index}`"
-                :style="{ '--line-index': index }"
-              >
-                {{ line }}
+              <span v-for="(line, lineIndex) in hoveredPastCharacters" :key="`${hoveredPastId || 'empty'}-${lineIndex}`" class="film-hover-line">
+                <span
+                  v-for="(char, charIndex) in line"
+                  :key="`${lineIndex}-${charIndex}`"
+                  class="film-hover-char"
+                  :style="{ '--char-index': charIndex, '--line-index': lineIndex }"
+                >
+                  {{ char === " " ? "\u00a0" : char }}
+                </span>
               </span>
             </div>
           </section>

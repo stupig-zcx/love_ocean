@@ -37,7 +37,7 @@ const pickAudioSource = (...fileNames) => fileNames.map((name) => audioByName[na
 const musicByKey = {
   ocean: pickAudioSource("ocean.mp3", "sea.mp3", "ocean.wav"),
   sky: pickAudioSource("sky.mp3", "stars.mp3", "sky.wav"),
-  fragments: pickAudioSource("fragments.mp3", "memory.mp3", "fragments.wav"),
+  fragments: pickAudioSource("movie.mp3", "fragments.mp3", "memory.mp3", "fragments.wav"),
   travel: pickAudioSource("map.mp3", "travel.mp3", "travel.wav"),
 };
 

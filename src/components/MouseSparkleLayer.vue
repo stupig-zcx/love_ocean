@@ -140,6 +140,27 @@ const appendTravelStreamPoint = (x, y, dx, dy) => {
   }
 };
 
+const spawnFilmTrail = (x, y) => {
+  for (let i = 0; i < 7; i += 1) {
+    trail.push({
+      kind: "film",
+      x: x + random(-5, 5),
+      y: y + random(-5, 5),
+      vx: random(-0.9, 0.9),
+      vy: random(-0.95, 0.45),
+      life: random(28, 54),
+      maxLife: random(28, 54),
+      r: random(0.8, 2.2),
+      angle: random(0, Math.PI),
+      spin: random(-0.045, 0.045),
+      warm: random(34, 48),
+    });
+  }
+  if (trail.length > MAX_TRAIL_ITEMS) {
+    trail.splice(0, trail.length - MAX_TRAIL_ITEMS);
+  }
+};
+
 const onPointerMove = (event) => {
   const nextX = event.clientX;
   const nextY = event.clientY;
@@ -161,6 +182,8 @@ const onPointerMove = (event) => {
     }
   } else if (props.mode === "star") {
     spawnStarTrail(mouse.x, mouse.y);
+  } else if (props.mode === "film") {
+    spawnFilmTrail(mouse.x, mouse.y);
   } else if (props.mode === "travel") {
     appendTravelStreamPoint(mouse.x, mouse.y, dx, dy);
   }
@@ -328,6 +351,43 @@ const drawTravel = () => {
   }
 };
 
+const drawFilm = () => {
+  drawStars(true);
+
+  for (let i = trail.length - 1; i >= 0; i -= 1) {
+    const item = trail[i];
+    item.life -= 1;
+    item.x += item.vx;
+    item.y += item.vy;
+    item.vy += 0.01;
+    item.vx *= 0.982;
+    item.vy *= 0.982;
+    item.angle += item.spin;
+
+    if (item.life <= 0) {
+      trail.splice(i, 1);
+      continue;
+    }
+
+    const alpha = (item.life / item.maxLife) * 0.78;
+    const glow = ctx.createRadialGradient(item.x, item.y, 0, item.x, item.y, item.r * 5.5);
+    glow.addColorStop(0, `hsla(${item.warm}, 95%, 78%, ${alpha * 0.5})`);
+    glow.addColorStop(1, `hsla(${item.warm}, 95%, 78%, 0)`);
+
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, item.r * 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = glow;
+    ctx.fill();
+
+    ctx.save();
+    ctx.translate(item.x, item.y);
+    ctx.rotate(item.angle);
+    ctx.fillStyle = `hsla(${item.warm}, 92%, 72%, ${alpha})`;
+    ctx.fillRect(-item.r * 1.8, -item.r * 0.45, item.r * 3.6, item.r * 0.9);
+    ctx.restore();
+  }
+};
+
 const draw = () => {
   if (!ctx || !canvasRef.value) {
     return;
@@ -341,6 +401,8 @@ const draw = () => {
     drawOcean(width, height);
   } else if (props.mode === "travel") {
     drawTravel();
+  } else if (props.mode === "film") {
+    drawFilm();
   } else if (props.mode === "soft") {
     drawStars(true);
   } else {

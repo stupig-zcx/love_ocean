@@ -27,7 +27,7 @@ export const sceneRegistry = [
     id: "fragments",
     enabled: true,
     component: FragmentsScene,
-    sparkleMode: "soft",
+    sparkleMode: "film",
     musicKey: "fragments",
     panelClass: "fragments-panel",
     ariaLabel: "Daily Fragments Scene",
