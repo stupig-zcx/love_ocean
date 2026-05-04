@@ -18,6 +18,7 @@ const trail = [];
 const travelStreamPoints = [];
 const mouse = { x: 0, y: 0, prevX: 0, prevY: 0, hasPrevious: false, active: false };
 let lastOceanTrailAt = 0;
+let lastFilmTrailAt = 0;
 const MAX_TRAIL_ITEMS = 260;
 const MAX_TRAVEL_STREAM_POINTS = 34;
 const TRAVEL_STREAM_POINT_LIFE = 50;
@@ -141,19 +142,21 @@ const appendTravelStreamPoint = (x, y, dx, dy) => {
 };
 
 const spawnFilmTrail = (x, y) => {
-  for (let i = 0; i < 7; i += 1) {
+  const notes = ["♪", "♫", "♬", "♩"];
+  for (let i = 0; i < 2; i += 1) {
     trail.push({
       kind: "film",
       x: x + random(-5, 5),
       y: y + random(-5, 5),
-      vx: random(-0.9, 0.9),
-      vy: random(-0.95, 0.45),
-      life: random(28, 54),
-      maxLife: random(28, 54),
-      r: random(0.8, 2.2),
-      angle: random(0, Math.PI),
-      spin: random(-0.045, 0.045),
-      warm: random(34, 48),
+      vx: random(-0.72, 0.72),
+      vy: random(-1.25, -0.18),
+      life: random(34, 62),
+      maxLife: random(34, 62),
+      size: random(13, 22),
+      note: notes[Math.floor(random(0, notes.length))],
+      angle: random(-0.32, 0.32),
+      spin: random(-0.018, 0.018),
+      shade: Math.random() > 0.5 ? random(235, 255) : random(12, 42),
     });
   }
   if (trail.length > MAX_TRAIL_ITEMS) {
@@ -183,7 +186,11 @@ const onPointerMove = (event) => {
   } else if (props.mode === "star") {
     spawnStarTrail(mouse.x, mouse.y);
   } else if (props.mode === "film") {
-    spawnFilmTrail(mouse.x, mouse.y);
+    const now = performance.now();
+    if (now - lastFilmTrailAt > 72) {
+      spawnFilmTrail(mouse.x, mouse.y);
+      lastFilmTrailAt = now;
+    }
   } else if (props.mode === "travel") {
     appendTravelStreamPoint(mouse.x, mouse.y, dx, dy);
   }
@@ -370,20 +377,23 @@ const drawFilm = () => {
     }
 
     const alpha = (item.life / item.maxLife) * 0.78;
-    const glow = ctx.createRadialGradient(item.x, item.y, 0, item.x, item.y, item.r * 5.5);
-    glow.addColorStop(0, `hsla(${item.warm}, 95%, 78%, ${alpha * 0.5})`);
-    glow.addColorStop(1, `hsla(${item.warm}, 95%, 78%, 0)`);
+    const glow = ctx.createRadialGradient(item.x, item.y, 0, item.x, item.y, item.size * 1.15);
+    glow.addColorStop(0, `rgba(${item.shade}, ${item.shade}, ${item.shade}, ${alpha * 0.24})`);
+    glow.addColorStop(1, `rgba(${item.shade}, ${item.shade}, ${item.shade}, 0)`);
 
     ctx.beginPath();
-    ctx.arc(item.x, item.y, item.r * 5.5, 0, Math.PI * 2);
+    ctx.arc(item.x, item.y, item.size * 1.2, 0, Math.PI * 2);
     ctx.fillStyle = glow;
     ctx.fill();
 
     ctx.save();
     ctx.translate(item.x, item.y);
     ctx.rotate(item.angle);
-    ctx.fillStyle = `hsla(${item.warm}, 92%, 72%, ${alpha})`;
-    ctx.fillRect(-item.r * 1.8, -item.r * 0.45, item.r * 3.6, item.r * 0.9);
+    ctx.font = `600 ${item.size}px "Cormorant Garamond", "Times New Roman", serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = `rgba(${item.shade}, ${item.shade}, ${item.shade}, ${alpha})`;
+    ctx.fillText(item.note, 0, 0);
     ctx.restore();
   }
 };

@@ -1359,8 +1359,9 @@ body {
 }
 
 .reel-card--future h3 {
-  font-size: 1.08rem;
-  letter-spacing: 0.04em;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .reel-text {
@@ -1376,12 +1377,12 @@ body {
 }
 
 .reel-card--future .reel-text {
-  font-size: 0.72rem;
-  line-height: 1.45;
+  font-size: 0.64rem;
+  line-height: 1.38;
 }
 
 .reel-card--future .reel-date {
-  font-size: 0.58rem;
+  font-size: 0.54rem;
 }
 
 .reel-text--long {
@@ -1427,8 +1428,8 @@ body {
   font-size: 0.86rem;
   letter-spacing: 0.04em;
   line-height: 1.56;
-  color: #4b2d17;
-  text-shadow: 0 1px 0 rgba(255, 244, 220, 0.72);
+  color: #231306;
+  text-shadow: 0 1px 0 rgba(255, 244, 220, 0.36);
 }
 
 .film-hover-char {
@@ -1983,7 +1984,8 @@ body {
   }
 
   .reel-card--future h3 {
-    font-size: 0.82rem;
+    font-size: 0.52rem;
+    font-weight: 700;
   }
 
   .reel-text {
@@ -1993,8 +1995,8 @@ body {
   }
 
   .reel-card--future .reel-text {
-    font-size: 0.58rem;
-    line-height: 1.34;
+    font-size: 0.52rem;
+    line-height: 1.3;
   }
 
   .reel-date {
