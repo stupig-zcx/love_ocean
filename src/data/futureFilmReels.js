@@ -36,4 +36,28 @@ export const futureFilmReels = [
     wishText: "一起跨年，第一个，第二个...第N个跨年，记录每一次的拥抱",
     sceneNote: "镜头提示：夜晚，酒杯，温暖的拥抱。",
   },
+  {
+    id: "future-7",
+    title: "登山",
+    wishText: "一起爬山，=相拥在山顶，或登不上去就那样坐着",
+    sceneNote: "镜头提示：远处的云海。",
+  },
+  {
+    id: "future-8",
+    title: "游乐园",
+    wishText: "一起去游乐园里疯玩，拍一张我们笑得最开心的照片。",
+    sceneNote: "镜头提示：彩色的游乐设施，欢声笑语，阳光明媚。",
+  },
+  {
+    id: "future-9",
+    title: "猫/狗",
+    wishText: "再养一只猫/狗,奶酪是他们的大哥！",
+    sceneNote: "镜头提示：宠物",
+  },
+    {
+    id: "future-end",
+    title: "死在床上",
+    wishText: "一起死在床上",
+    sceneNote: "镜头提示：温暖的床，柔和的光线，安详的表情。",
+  },
 ];
