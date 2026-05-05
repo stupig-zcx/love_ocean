@@ -840,9 +840,9 @@ body {
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(circle at 82% 8%, rgba(210, 255, 203, 0.24), transparent 30%),
-    radial-gradient(circle at 12% 18%, rgba(98, 207, 146, 0.22), transparent 28%),
-    linear-gradient(135deg, rgba(17, 63, 43, 0.9), rgba(7, 34, 27, 0.92) 46%, rgba(25, 79, 53, 0.94) 100%);
+    radial-gradient(circle at 86% 10%, rgba(205, 255, 196, 0.22), transparent 28%),
+    radial-gradient(circle at 12% 82%, rgba(93, 174, 104, 0.18), transparent 32%),
+    linear-gradient(135deg, rgba(16, 58, 39, 0.96), rgba(5, 28, 22, 0.96) 44%, rgba(27, 83, 54, 0.98) 100%);
   overflow: hidden;
 }
 
@@ -856,22 +856,17 @@ body {
 
 .travel-panel::before {
   background:
-    repeating-linear-gradient(0deg, rgba(205, 255, 211, 0.045) 0 1px, transparent 1px 34px),
-    repeating-linear-gradient(90deg, rgba(205, 255, 211, 0.035) 0 1px, transparent 1px 34px),
-    radial-gradient(circle at 36% 34%, rgba(218, 255, 190, 0.72) 0 2px, transparent 3px),
-    radial-gradient(circle at 58% 20%, rgba(218, 255, 190, 0.52) 0 1px, transparent 2px),
-    radial-gradient(circle at 72% 63%, rgba(218, 255, 190, 0.48) 0 1px, transparent 2px);
-  background-size: auto, auto, 260px 220px, 310px 250px, 290px 240px;
-  opacity: 0.66;
+    repeating-radial-gradient(ellipse at 24% 30%, transparent 0 22px, rgba(196, 255, 190, 0.05) 23px 24px),
+    repeating-radial-gradient(ellipse at 78% 28%, transparent 0 28px, rgba(196, 255, 190, 0.035) 29px 30px);
+  opacity: 0.5;
   mix-blend-mode: screen;
 }
 
 .travel-panel::after {
   background:
-    radial-gradient(ellipse at 18% 100%, rgba(180, 240, 178, 0.24), transparent 30%),
-    radial-gradient(ellipse at 91% 96%, rgba(200, 255, 196, 0.2), transparent 24%),
-    repeating-radial-gradient(ellipse at 28% 25%, transparent 0 18px, rgba(189, 255, 189, 0.045) 19px 20px);
-  opacity: 0.8;
+    radial-gradient(ellipse at 50% 104%, rgba(7, 30, 18, 0.74) 0 11%, transparent 34%),
+    radial-gradient(ellipse at center, transparent 50%, rgba(1, 16, 12, 0.26) 100%);
+  opacity: 0.82;
 }
 
 .sky-panel::before {
@@ -1191,6 +1186,40 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+.travel-content {
+  position: relative;
+  isolation: isolate;
+}
+
+.travel-content::before,
+.travel-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.travel-content::before {
+  background:
+    radial-gradient(ellipse 70px 220px at 4% 100%, rgba(21, 78, 38, 0.9) 0 58%, transparent 59%),
+    radial-gradient(ellipse 56px 180px at 11% 102%, rgba(49, 116, 53, 0.82) 0 58%, transparent 59%),
+    radial-gradient(ellipse 48px 150px at 18% 104%, rgba(28, 92, 45, 0.78) 0 58%, transparent 59%),
+    radial-gradient(ellipse 74px 230px at 96% 101%, rgba(22, 82, 40, 0.9) 0 58%, transparent 59%),
+    radial-gradient(ellipse 54px 180px at 88% 103%, rgba(54, 122, 56, 0.8) 0 58%, transparent 59%),
+    radial-gradient(ellipse at 50% 100%, rgba(5, 24, 15, 0.46), transparent 34%);
+  opacity: 0.96;
+}
+
+.travel-content::after {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 100%),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 100%);
+  background-size: 46px 46px;
+  opacity: 0.36;
+  mix-blend-mode: screen;
 }
 
 .fragments-content {
@@ -1706,9 +1735,22 @@ body {
   height: min(62vh, 620px);
   display: block;
   filter:
-    drop-shadow(0 28px 0 rgba(3, 18, 13, 0.22))
-    drop-shadow(0 30px 38px rgba(0, 0, 0, 0.32))
+    drop-shadow(0 34px 0 rgba(3, 18, 13, 0.28))
+    drop-shadow(0 38px 46px rgba(0, 0, 0, 0.38))
     drop-shadow(0 -1px 0 rgba(239, 255, 240, 0.42));
+}
+
+.province-depth-layer {
+  transform: translate(10px, 16px);
+  opacity: 0.48;
+  pointer-events: none;
+}
+
+.province-depth-path {
+  fill: rgba(4, 28, 18, 0.72);
+  stroke: rgba(12, 47, 29, 0.62);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
 }
 
 .province-region {
@@ -1777,6 +1819,19 @@ body {
     drop-shadow(0 8px 0 rgba(55, 132, 74, 0.58))
     drop-shadow(0 20px 24px rgba(0, 0, 0, 0.26))
     drop-shadow(0 0 20px rgba(174, 252, 210, 0.62));
+}
+
+.province-active-outline {
+  fill: rgba(190, 255, 201, 0.18);
+  stroke: #ffffff;
+  stroke-width: 2.8;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 8px 0 rgba(43, 118, 63, 0.5))
+    drop-shadow(0 20px 22px rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0 20px rgba(207, 255, 213, 0.72));
+  animation: provinceOutlineIn 0.34s ease both;
 }
 
 .map-loading-label {
@@ -1862,21 +1917,33 @@ body {
   justify-self: center;
   width: min(100%, 320px);
   height: 230px;
-  padding: 18px clamp(16px, 1.5vw, 22px);
+  padding: 10px clamp(8px, 1.1vw, 14px);
   color: rgba(235, 248, 240, 0.94);
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border: 1px solid rgba(220, 255, 228, 0.24);
-  border-radius: 24px;
-  background:
-    linear-gradient(150deg, rgba(231, 255, 229, 0.14), rgba(8, 39, 25, 0.08)),
-    rgba(5, 27, 18, 0.46);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(11, 48, 28, 0.38),
-    0 22px 54px rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(12px);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  animation: travelTextPanelIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.travel-note-panel > * {
+  animation: travelTextFloatIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.travel-note-panel > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.travel-note-panel > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.travel-note-panel > *:nth-child(4) {
+  animation-delay: 0.12s;
 }
 
 .travel-note-panel.empty {
@@ -1894,7 +1961,7 @@ body {
 .travel-province-name {
   margin: 0;
   font-family: "ZCOOL KuaiLe", "Microsoft YaHei", sans-serif;
-  font-size: clamp(1.2rem, 1.8vw, 1.72rem);
+  font-size: clamp(0.98rem, 1.35vw, 1.28rem);
   line-height: 1.12;
   color: #f5fff8;
   letter-spacing: 0.02em;
@@ -1961,6 +2028,44 @@ body {
 .legend-chip.visited {
   background: rgba(127, 235, 181, 0.86);
   border-color: rgba(231, 255, 245, 0.95);
+}
+
+@keyframes provinceOutlineIn {
+  from {
+    opacity: 0;
+    filter:
+      drop-shadow(0 4px 0 rgba(43, 118, 63, 0.32))
+      drop-shadow(0 10px 16px rgba(0, 0, 0, 0.2))
+      drop-shadow(0 0 4px rgba(207, 255, 213, 0.22));
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes travelTextPanelIn {
+  from {
+    opacity: 0.72;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes travelTextFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .story-footer {
@@ -2423,7 +2528,7 @@ body {
   }
 
   .travel-province-name {
-    font-size: 1.18rem;
+    font-size: 1rem;
     line-height: 1.16;
   }
 

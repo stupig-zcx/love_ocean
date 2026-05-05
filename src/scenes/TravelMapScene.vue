@@ -228,6 +228,16 @@ watch(
               {{ loadState === "error" ? "地图加载失败" : "正在加载中国地图..." }}
             </text>
 
+            <g class="province-depth-layer" aria-hidden="true">
+              <path
+                v-for="item in provinceShapes"
+                :key="`depth-${item.code}`"
+                class="province-depth-path"
+                :d="item.path"
+                fill-rule="evenodd"
+              />
+            </g>
+
             <g
               v-for="item in provinceShapes"
               :key="item.code"
@@ -243,6 +253,14 @@ watch(
               <path class="province-path" :d="item.path" fill-rule="evenodd" />
               <title>{{ item.name }}</title>
             </g>
+
+            <path
+              v-if="activeProvince"
+              class="province-active-outline"
+              :d="activeProvince.path"
+              fill-rule="evenodd"
+              aria-hidden="true"
+            />
           </svg>
 
           <div class="travel-legend">
@@ -281,7 +299,11 @@ watch(
             </svg>
           </div>
 
-          <div class="travel-note-panel" :class="{ empty: !activeProvince }">
+          <div
+            :key="activeDetailCode || 'travel-empty'"
+            class="travel-note-panel"
+            :class="{ empty: !activeProvince }"
+          >
             <p class="travel-note-date">{{ detailState.date }}</p>
             <h3 class="travel-province-name">{{ activeProvince ? activeProvince.name : "旅行档案" }}</h3>
             <p class="travel-note-title">{{ detailState.title }}</p>
