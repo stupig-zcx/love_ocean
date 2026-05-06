@@ -1,189 +1,139 @@
-# 项目部署指南
+# 国内公网部署指南
 
-本指南将帮助您将此Vue 3项目部署到公网上。
+本项目是 Vue 3 + Vite 的纯静态站点，生产文件由 `npm run build` 输出到 `dist/`。要在中国大陆公网稳定访问，优先选择以下两种方式：
 
-## 项目概述
+1. 国内云服务器 + Nginx
+2. 阿里云 OSS / 腾讯云 COS 静态网站托管
 
-- **项目类型**：纯前端Vue 3应用
-- **构建工具**：Vite
-- **构建输出**：静态文件（位于`dist`目录）
+> 如果绑定中国大陆备案域名，需要先完成 ICP 备案。没有备案域名时，可以先用云服务器公网 IP 临时访问。
 
-## 部署选项
+## 方式一：国内云服务器 + Nginx
 
-### 1. 静态网站托管服务（推荐）
+适合已经有阿里云 ECS、腾讯云 CVM、华为云 ECS 等服务器的情况。
 
-这些服务专为静态网站设计，操作简单且通常提供免费计划。
+### 服务器准备
 
-#### Vercel
+服务器需要：
 
-1. **准备工作**：
-   - 将项目上传到GitHub/GitLab/Bitbucket
-   - 注册Vercel账号：https://vercel.com
+- 公网 IP
+- 22 端口 SSH 可登录
+- 安全组放行 80 端口；如启用 HTTPS，再放行 443 端口
+- 已安装 Nginx
 
-2. **部署步骤**：
-   - 登录Vercel，点击「New Project」
-   - 选择您的项目仓库
-   - 配置构建设置：cp package.json package.json.backup
-     - Framework: `Vue.js`
-     - Build Command: `npm run build`
-     - Output Directory: `dist`
-   - 点击「Deploy」
-   - 部署完成后，Vercel会提供一个域名（如`your-project.vercel.app`）
+Ubuntu / Debian 安装示例：
 
-#### Netlify
+```bash
+sudo apt update
+sudo apt install -y nginx
+sudo systemctl enable --now nginx
+```
 
-1. **准备工作**：
-   - 将项目上传到GitHub/GitLab/Bitbucket
-   - 注册Netlify账号：https://www.netlify.com
+### 上传站点
 
-2. **部署步骤**：
-   - 登录Netlify，点击「Add new site」→「Import an existing project」
-   - 选择您的项目仓库
-   - 配置构建设置：
-     - Build command: `npm run build`
-     - Publish directory: `dist`
-   - 点击「Deploy site」
-   - 部署完成后，Netlify会提供一个域名（如`your-project.netlify.app`）
+在本机运行：
 
-#### GitHub Pages
+```powershell
+.\scripts\deploy-server.ps1 -ServerHost "你的服务器公网IP" -User "root" -RemotePath "/var/www/love-ocean"
+```
 
-1. **准备工作**：
-   - 将项目上传到GitHub仓库
+如果 SSH 使用非默认端口：
 
-2. **部署步骤**：
-   - 安装`gh-pages`包：`npm install --save-dev gh-pages`
-   - 在`package.json`中添加部署脚本：
-     ```json
-     "scripts": {
-       "dev": "vite",
-       "build": "vite build",
-       "preview": "vite preview",
-       "deploy": "gh-pages -d dist"
-     }
-     ```
-   - 构建项目：`npm run build`
-   - 部署到GitHub Pages：`npm run deploy`
-   - 访问：`https://your-username.github.io/your-repo-name`
+```powershell
+.\scripts\deploy-server.ps1 -ServerHost "你的服务器公网IP" -User "root" -Port 2222 -RemotePath "/var/www/love-ocean"
+```
 
-### 2. 传统服务器部署
+### Nginx 配置
 
-如果您有自己的服务器，可以使用以下方法部署：
+在服务器创建 `/etc/nginx/sites-available/love-ocean`：
 
-#### Nginx部署
+```nginx
+server {
+    listen 80;
+    server_name _;
 
-1. **准备工作**：
-   - 拥有一台运行Linux的服务器
-   - 安装Nginx
+    root /var/www/love-ocean;
+    index index.html;
 
-2. **部署步骤**：
-   - 构建项目：`npm run build`
-   - 将`dist`目录上传到服务器（例如使用`scp`命令）
-   - 配置Nginx虚拟主机：
-     ```nginx
-     server {
-       listen 80;
-       server_name your-domain.com;
-       
-       root /path/to/your/dist;
-       index index.html;
-       
-       location / {
-         try_files $uri $uri/ /index.html;
-       }
-     }
-     ```
-   - 重启Nginx：`sudo systemctl restart nginx`
-   - 访问：`http://your-domain.com`
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 
-#### Docker部署
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 
-1. **准备工作**：
-   - 安装Docker
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
 
-2. **创建Dockerfile**：
-   ```dockerfile
-   # 基础镜像
-   FROM nginx:alpine
-   
-   # 复制构建文件到Nginx默认目录
-   COPY dist/ /usr/share/nginx/html
-   
-   # 暴露80端口
-   EXPOSE 80
-   
-   # 启动Nginx
-   CMD ["nginx", "-g", "daemon off;"]
-   ```
+启用配置：
 
-3. **构建和运行容器**：
-   - 构建项目：`npm run build`
-   - 构建Docker镜像：`docker build -t love-story-site .`
-   - 运行容器：`docker run -d -p 80:80 --name love-story-site love-story-site`
-   - 访问：`http://your-server-ip`
+```bash
+sudo ln -sf /etc/nginx/sites-available/love-ocean /etc/nginx/sites-enabled/love-ocean
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
-### 3. 云服务提供商
+访问：
 
-#### AWS S3 + CloudFront
+```text
+http://你的服务器公网IP/
+```
 
-1. **准备工作**：
-   - 注册AWS账号
+## 方式二：阿里云 OSS 静态网站托管
 
-2. **部署步骤**：
-   - 构建项目：`npm run build`
-   - 创建S3存储桶，设置为静态网站托管
-   - 上传`dist`目录内容到S3存储桶
-   - 创建CloudFront分发，指向S3存储桶
-   - 配置自定义域名（可选）
+适合只托管静态文件、不想维护服务器的情况。
 
-#### Google Cloud Storage + CDN
+基本步骤：
 
-1. **准备工作**：
-   - 注册Google Cloud账号
+1. 创建 OSS Bucket，地域选择中国大陆。
+2. 上传 `dist/` 目录内的全部文件。
+3. 开启静态网站托管，首页设置为 `index.html`。
+4. 如需自定义域名，先完成备案，再在 OSS 绑定域名并配置 CNAME。
+5. 如页面刷新出现 404，将错误页也设置为 `index.html`。
 
-2. **部署步骤**：
-   - 构建项目：`npm run build`
-   - 创建Cloud Storage存储桶，设置为公共访问
-   - 上传`dist`目录内容到存储桶
-   - 配置CDN（可选）
+## 方式三：腾讯云 COS 静态网站托管
 
-## 环境变量配置
+基本步骤：
 
-如果您的项目需要环境变量，可以：
+1. 创建 COS 存储桶，地域选择中国大陆。
+2. 上传 `dist/` 目录内的全部文件。
+3. 开启静态网站功能，索引文档设置为 `index.html`。
+4. 如需自定义域名，先完成备案，再绑定域名并配置 CNAME。
+5. 如页面刷新出现 404，将错误文档设置为 `index.html`。
 
-1. 在`.env`文件中定义（开发环境）
-2. 在部署平台的环境变量设置中配置（生产环境）
+## 当前项目构建命令
 
-## 部署后验证
+```powershell
+npm install
+npm run build
+```
 
-部署完成后，确保：
-- 网站可以正常访问
-- 所有资源（图片、CSS、JS）加载正常
-- 路由功能正常（如果有）
-- 响应式设计在不同设备上正常显示
+构建成功后，发布目录为：
 
-## 持续部署
+```text
+D:\codex\web\dist
+```
 
-对于频繁更新的项目，建议设置持续部署：
-- Vercel/Netlify：自动检测仓库更新并部署
-- GitHub Actions：配置CI/CD工作流
+## 我需要你提供什么才能直接发布
 
-## 常见问题
+如果选择云服务器：
 
-### 404错误
-- 确保服务器配置了回退到`index.html`（对于SPA应用）
-- 检查路由配置
+- 服务器公网 IP
+- SSH 用户名
+- SSH 端口
+- 登录方式：本机已有密钥，或你提供临时密码/密钥
 
-### 资源加载失败
-- 检查资源路径是否正确
-- 确保构建时使用了正确的公共路径
+如果选择 OSS/COS：
 
-### 性能优化
-- 启用CDN加速
-- 压缩静态资源
-- 配置浏览器缓存
+- 云厂商：阿里云或腾讯云
+- Bucket 名称和地域
+- 可上传静态文件的临时 AccessKey / SecretKey，或让我在你已登录的 CLI 环境里执行
 
-## 总结
+如果需要域名访问：
 
-对于此Vue 3项目，推荐使用静态网站托管服务（如Vercel或Netlify），它们操作简单、速度快且提供免费计划，非常适合纯前端应用。
-
-如果您需要更多自定义配置或已有服务器资源，可以选择传统服务器部署或云服务提供商方案。
+- 域名
+- 是否已完成 ICP 备案
+- DNS 是否能由你修改

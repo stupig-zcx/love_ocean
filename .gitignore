@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-deploy.zip
+cos-upload/
+cos-upload.zip
 .vite/
 .codex/
-

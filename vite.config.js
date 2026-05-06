@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 
 // Vite dev/build config for the love-story app.
 export default defineConfig({
+  base: "./",
   plugins: [vue()],
   server: {
     host: true,
